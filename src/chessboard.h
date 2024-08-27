@@ -1,10 +1,6 @@
 #ifndef CHESSBOARD_H
 #define CHESSBOARD_H
 
-#include <GL/glew.h>
-
-void drawChessboard(GLuint program);
-void drawLabels();
-void initTextRenderer();
+void drawChessboard(unsigned int shaderProgram, unsigned int boardTextures[2], unsigned int pieceTexture);
 
 #endif // CHESSBOARD_H
