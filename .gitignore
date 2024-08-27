@@ -1,0 +1,17 @@
+# Ignore build outputs
+chess_board
+*.o
+*.obj
+*.exe
+*.log
+*.tmp
+
+# Ignore VS Code settings folder
+.vscode/
+
+# Ignore MacOS system files
+.DS_Store
+
+# Ignore Linux file system files
+*~
+.directory
