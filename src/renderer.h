@@ -1,7 +1,10 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-void initializeRenderer(unsigned int shaderProgram);
-void resizeRenderer(unsigned int shaderProgram, int windowWidth, int windowHeight);
+#include <GLFW/glfw3.h>
 
-#endif // RENDERER_H
+void initializeRenderer(unsigned int shaderProgram, GLFWwindow* window);
+void resizeRenderer(unsigned int shaderProgram, int windowWidth, int windowHeight);
+void setViewport(GLFWwindow* window);
+
+#endif

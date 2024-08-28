@@ -5,12 +5,11 @@
 #include "texture.h"
 #include "chessboard.h"
 #include "renderer.h"
+#include "window.h"
 
-// Window resize callback function
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
-    unsigned int shaderProgram = *(unsigned int*)glfwGetWindowUserPointer(window);
-    resizeRenderer(shaderProgram, width, height);
+    resizeRenderer(glGetUniformLocation(*(unsigned int*)glfwGetWindowUserPointer(window), "projection"), width, height);
+    setViewport(window);
 }
 
 int main() {
@@ -18,27 +17,17 @@ int main() {
         return -1;
     }
 
-    // Calculate initial window size based on the grid size
-    int initialWindowSize = GRID_SIZE * 100; // Assume each square is 100 pixels
-
-    GLFWwindow* window = glfwCreateWindow(initialWindowSize, initialWindowSize, "Chessboard", NULL, NULL);
-    if (!window) {
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
+    GLFWwindow* window = createWindow(800, 800, "Chessboard");
+    if (!window) return -1;
 
     glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_OK) {
-        return -1;
-    }
+    if (glewInit() != GLEW_OK) return -1;
 
     unsigned int shaderProgram = loadShaders(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
-
     glfwSetWindowUserPointer(window, &shaderProgram);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    initializeRenderer(shaderProgram);
+    initializeRenderer(shaderProgram, window);
 
     unsigned int boardTextures[2];
     boardTextures[0] = loadTexture(LIGHT_SQUARE_TEXTURE_PATH);
@@ -49,11 +38,9 @@ int main() {
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Draw the chessboard and the piece at the specified position
         drawChessboard(shaderProgram, boardTextures, pieceTexture);
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        updateWindow(window);
     }
 
     glfwTerminate();
