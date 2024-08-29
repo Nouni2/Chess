@@ -23,6 +23,9 @@ extern const int PIECE_POSITION_Y;
 // Chessboard grid size
 extern const int GRID_SIZE;
 
+// Scaling factor for pieces
+extern const float PIECE_SCALING_FACTOR;
+
 // Function to log the configuration values
 void logConfigValues();
 

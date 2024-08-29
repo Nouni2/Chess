@@ -11,6 +11,7 @@ const char* FRAGMENT_SHADER_PATH = "shaders/fragment_shader.glsl";
 // Define the resolution and whether shadows are used
 const bool USE_SHADOW = true;  // True for shadowed pieces
 const int RESOLUTION = 512;    // Use 512px resolution; change as needed
+const float PIECE_SCALING_FACTOR = 0.8f; // Adjust the scaling factor (1.0 is the standard size)
 
 // Determine the shadow folder and resolution folder
 const std::string shadowFolder = USE_SHADOW ? "With Shadow" : "No Shadow";
@@ -36,6 +37,7 @@ const int GRID_SIZE = 8; // 8x8 chessboard
 void logConfigValues() {
     logger.log(LogLevel::DEBUG, "USE_SHADOW: " + std::string(USE_SHADOW ? "True" : "False"));
     logger.log(LogLevel::DEBUG, "RESOLUTION: " + std::to_string(RESOLUTION));
+    logger.log(LogLevel::DEBUG, "PIECE_SCALING_FACTOR: " + std::to_string(PIECE_SCALING_FACTOR));
 
     logger.log(LogLevel::INFO, "Light Square Texture Path: " + lightSquareTexture);
     logger.log(LogLevel::INFO, "Dark Square Texture Path: " + darkSquareTexture);

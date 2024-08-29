@@ -97,12 +97,14 @@ void drawPiece(unsigned int shaderProgram, const Piece& piece) {
     float squareSize = 1.0f / GRID_SIZE;
     float halfSquareSize = squareSize / 2.0f;
 
+    float scaleFactor = PIECE_SCALING_FACTOR;
+
     float squareVertices[] = {
-        // positions                      // texture coords
-        -halfSquareSize, -halfSquareSize, 0.0f, 0.0f, 0.0f,
-         halfSquareSize, -halfSquareSize, 0.0f, 1.0f, 0.0f,
-         halfSquareSize,  halfSquareSize, 0.0f, 1.0f, 1.0f,
-        -halfSquareSize,  halfSquareSize, 0.0f, 0.0f, 1.0f,
+        // positions (scaled)             // texture coords
+        -halfSquareSize * scaleFactor, -halfSquareSize * scaleFactor, 0.0f, 0.0f, 0.0f,
+         halfSquareSize * scaleFactor, -halfSquareSize * scaleFactor, 0.0f, 1.0f, 0.0f,
+         halfSquareSize * scaleFactor,  halfSquareSize * scaleFactor, 0.0f, 1.0f, 1.0f,
+        -halfSquareSize * scaleFactor,  halfSquareSize * scaleFactor, 0.0f, 0.0f, 1.0f,
     };
 
     unsigned int indices[] = {
