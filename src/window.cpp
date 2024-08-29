@@ -1,45 +1,46 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "window.h"
-#include <iostream>
+#include "log.h"  // Include the logger
+
+extern Logger logger;  // Use the global logger
 
 GLFWwindow* createWindow(int width, int height, const char* title) {
-    // Initialize GLFW
+    logger.log(LogLevel::INFO, "Creating window with size: " + std::to_string(width) + "x" + std::to_string(height));
+
     if (!glfwInit()) {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
+        logger.log(LogLevel::CRITICAL, "Failed to initialize GLFW.");
         return nullptr;
     }
+    logger.log(LogLevel::INFO, "GLFW initialized successfully.");
 
-    // Set window hints for OpenGL version and profile
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    // Create the GLFW window
     GLFWwindow* window = glfwCreateWindow(width, height, title, nullptr, nullptr);
     if (!window) {
-        std::cerr << "Failed to create GLFW window" << std::endl;
+        logger.log(LogLevel::CRITICAL, "Failed to create GLFW window.");
         glfwTerminate();
         return nullptr;
     }
+    logger.log(LogLevel::INFO, "GLFW window created successfully.");
 
-    // Make the window's OpenGL context current
     glfwMakeContextCurrent(window);
 
-    // Initialize GLEW
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
-        std::cerr << "Failed to initialize GLEW" << std::endl;
+        logger.log(LogLevel::CRITICAL, "Failed to initialize GLEW.");
         return nullptr;
     }
+    logger.log(LogLevel::INFO, "GLEW initialized successfully.");
 
     return window;
 }
 
 void updateWindow(GLFWwindow* window) {
-    // Swap front and back buffers
+    logger.log(LogLevel::TRACE, "Updating window.");
+
     glfwSwapBuffers(window);
-    
-    // Poll for and process events
-    glfwPollEvents();
+    glfwPollEvents;
 }

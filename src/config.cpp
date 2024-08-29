@@ -1,4 +1,8 @@
 #include "config.h"
+#include "log.h"
+
+// Extern declaration of the logger
+extern Logger logger;
 
 // Shader paths
 const char* VERTEX_SHADER_PATH = "shaders/vertex_shader.glsl";
@@ -28,3 +32,15 @@ const int PIECE_POSITION_Y = 3; // Row 4 (0-based index)
 
 // Chessboard grid size
 const int GRID_SIZE = 8; // 8x8 chessboard
+
+void logConfigValues() {
+    logger.log(LogLevel::DEBUG, "USE_SHADOW: " + std::string(USE_SHADOW ? "True" : "False"));
+    logger.log(LogLevel::DEBUG, "RESOLUTION: " + std::to_string(RESOLUTION));
+
+    logger.log(LogLevel::INFO, "Light Square Texture Path: " + std::string(LIGHT_SQUARE_TEXTURE_PATH));
+    logger.log(LogLevel::INFO, "Dark Square Texture Path: " + std::string(DARK_SQUARE_TEXTURE_PATH));
+    logger.log(LogLevel::INFO, "Piece Texture Path: " + std::string(PIECE_TEXTURE_PATH));
+
+    logger.log(LogLevel::INFO, "Piece Position: (" + std::to_string(PIECE_POSITION_X) + ", " + std::to_string(PIECE_POSITION_Y) + ")");
+    logger.log(LogLevel::INFO, "Chessboard Grid Size: " + std::to_string(GRID_SIZE));
+}

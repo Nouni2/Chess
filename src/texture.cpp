@@ -2,8 +2,13 @@
 #include <GL/glew.h>
 #include <stb_image.h>
 #include <iostream>
+#include "log.h" // Include the logger
+
+extern Logger logger;  // Use the global logger
 
 unsigned int loadTexture(const char* path) {
+    logger.log(LogLevel::INFO, "Loading texture from path: " + std::string(path));
+
     unsigned int textureID;
     glGenTextures(1, &textureID);
 
@@ -28,8 +33,9 @@ unsigned int loadTexture(const char* path) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         stbi_image_free(data);
+        logger.log(LogLevel::INFO, "Texture loaded successfully: ID " + std::to_string(textureID));
     } else {
-        std::cout << "Failed to load texture: " << path << std::endl;
+        logger.log(LogLevel::ERROR, "Failed to load texture: " + std::string(path));
         stbi_image_free(data);
     }
 
