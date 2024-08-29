@@ -3,11 +3,17 @@
 
 #include "piece.h"
 #include "config.h"
+#include "log.h"
+
+extern Logger logger;
 
 class Queen : public Piece {
 public:
     Queen(PieceColor color) 
-        : Piece(color, generateTexturePath(color)) {} // Initialize with the correct texture path
+        : Piece(color, generateTexturePath(color)) {
+        logger.log(LogLevel::INFO, "Queen created with UID: " + std::to_string(getUID()) + 
+                   ", Color: " + (color == PieceColor::WHITE ? "White" : "Black"));
+    }
 
     std::vector<std::pair<int, int>> getLegalMoves(int x, int y) const override {
         std::vector<std::pair<int, int>> moves;
@@ -24,6 +30,9 @@ public:
             moves.push_back({x - i, y + i});
         }
 
+        logger.log(LogLevel::DEBUG, "Calculated legal moves for Queen with UID: " + std::to_string(getUID()) + 
+                   " from position (" + std::to_string(x) + ", " + std::to_string(y) + ").");
+
         return moves;
     }
 
@@ -31,7 +40,9 @@ private:
     static std::string generateTexturePath(PieceColor color) {
         // Generate the correct texture path based on the piece color
         std::string colorPrefix = (color == PieceColor::WHITE) ? "w_" : "b_";
-        return "assets/" + shadowFolder + "/" + resolutionFolder + "/" + colorPrefix + "queen.png";
+        std::string texturePath = "assets/" + shadowFolder + "/" + resolutionFolder + "/" + colorPrefix + "queen.png";
+        logger.log(LogLevel::INFO, "Generated texture path for Queen: " + texturePath);
+        return texturePath;
     }
 };
 

@@ -7,9 +7,9 @@
 #include "renderer.h"
 #include "window.h"
 #include "log.h"
-#include "game/pieces/queen.h"  // Correct path for Queen class
+#include "gameplay.h"
 
-extern Logger logger;  // Use the global logger
+extern Logger logger;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     logger.log(LogLevel::INFO, "Framebuffer size changed: " + std::to_string(width) + "x" + std::to_string(height));
@@ -65,12 +65,8 @@ int main() {
     }
     logger.log(LogLevel::INFO, "Board textures loaded successfully.");
 
-    // Create two Queen instances
-    Queen whiteQueen(PieceColor::WHITE);
-    whiteQueen.setPosition("d1"); // Place white queen on d1
-
-    Queen blackQueen(PieceColor::BLACK);
-    blackQueen.setPosition("d8"); // Place black queen on d8
+    std::vector<Piece*> pieces;
+    setupPieces(pieces);  // Setup the pieces
 
     logger.log(LogLevel::DEBUG, "Entering rendering loop...");
     while (!glfwWindowShouldClose(window)) {
@@ -80,11 +76,15 @@ int main() {
 
         drawChessboard(shaderProgram, boardTextures); // Draw the chessboard
 
-        drawPiece(shaderProgram, whiteQueen); // Draw the white queen
-        drawPiece(shaderProgram, blackQueen); // Draw the black queen
+        drawAllPieces(shaderProgram, pieces);  // Draw all the pieces
 
         updateWindow(window);
         logger.log(LogLevel::FRAME, "Frame displayed and events polled.");
+    }
+
+    // Cleanup dynamically allocated pieces
+    for (Piece* piece : pieces) {
+        delete piece;
     }
 
     logger.log(LogLevel::INFO, "Terminating application...");

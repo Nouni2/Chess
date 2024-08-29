@@ -5,7 +5,7 @@ Logger logger("chess.log");
 
 // Initialize the logger with the log file name
 Logger::Logger(const std::string& filename) {
-    logFile.open(filename, std::ios::out | std::ios::app);
+    logFile.open(filename, std::ios::out);
     if (!logFile.is_open()) {
         std::cerr << "Failed to open log file: " << filename << std::endl;
     }
