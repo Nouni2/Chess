@@ -2,6 +2,7 @@
 #include "viewer.h"
 #include "log.h"
 #include "renderer.h"
+#include "config.h"
 
 
 extern Logger logger;  // Use the global logger

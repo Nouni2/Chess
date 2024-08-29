@@ -28,9 +28,11 @@ void resizeRenderer(unsigned int shaderProgram, int windowWidth, int windowHeigh
     float orthoSize = GRID_SIZE / 2.0f;
 
     glm::mat4 projection;
-    if (aspectRatio >= 1.0f) {
+     if (aspectRatio >= 1.0f) {
+        // Maintain aspect ratio by adjusting width
         projection = glm::ortho(-orthoSize * aspectRatio, orthoSize * aspectRatio, -orthoSize, orthoSize, -1.0f, 1.0f);
     } else {
+        // Maintain aspect ratio by adjusting height
         projection = glm::ortho(-orthoSize, orthoSize, -orthoSize / aspectRatio, orthoSize / aspectRatio, -1.0f, 1.0f);
     }
 

@@ -7,6 +7,8 @@
 extern const std::string shadowFolder;
 extern const std::string resolutionFolder;
 
+extern  const int RESOLUTION;
+
 // Shader paths
 extern const char* VERTEX_SHADER_PATH;
 extern const char* FRAGMENT_SHADER_PATH;
