@@ -3,7 +3,7 @@
 #include "config.h"
 #include "shaders.h"
 #include "texture.h"
-#include "chessboard.h"
+#include "draw.h"
 #include "renderer.h"
 #include "window.h"
 #include "log.h"  // Include the logger
@@ -77,7 +77,11 @@ int main() {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        drawChessboard(shaderProgram, boardTextures, pieceTexture);
+        drawChessboard(shaderProgram, boardTextures); // Draw the chessboard
+
+        drawPiece(shaderProgram, pieceTexture, "e4"); // Draw the piece at location "e4"
+
+        drawPiece(shaderProgram, pieceTexture, "a1"); // Draw the piece at location "e4"
 
         updateWindow(window);
         logger.log(LogLevel::FRAME, "Frame displayed and events polled.");

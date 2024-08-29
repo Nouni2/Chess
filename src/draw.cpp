@@ -1,4 +1,4 @@
-#include "chessboard.h"
+#include "draw.h"
 #include <GL/glew.h>
 #include "config.h"
 #include <glm/glm.hpp>
@@ -7,7 +7,7 @@
 
 extern Logger logger;  // Use the global logger
 
-void drawChessboard(unsigned int shaderProgram, unsigned int boardTextures[2], unsigned int pieceTexture) {
+void drawChessboard(unsigned int shaderProgram, unsigned int boardTextures[2]) {
     static bool firstCall = true;
     if (firstCall) {
         logger.log(LogLevel::TRACE, "drawChessboard function called for the first time.");
@@ -75,6 +75,63 @@ void drawChessboard(unsigned int shaderProgram, unsigned int boardTextures[2], u
         }
     }
 
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    logger.log(LogLevel::FRAME, "Deleted VAO, VBO, and EBO after drawing the chessboard.");
+}
+
+void drawPiece(unsigned int shaderProgram, unsigned int pieceTexture, const std::string& location) {
+    static bool firstCall = true;
+    if (firstCall) {
+        logger.log(LogLevel::TRACE, "drawPiece function called for the first time.");
+        firstCall = false;
+    }
+
+    if (location.length() != 2 || location[0] < 'a' || location[0] > 'h' || location[1] < '1' || location[1] > '8') {
+        logger.log(LogLevel::ERROR, "Invalid location string: " + location);
+        return;
+    }
+
+    int col = 7 - (location[0] - 'a') ;  // Convert 'a' to 'h' into 0 to 7
+    int row = 7 - (location[1] - '1');  // Convert '1' to '8' into 7 to 0
+
+
+    float squareSize = 1.0f / GRID_SIZE;
+    float halfSquareSize = squareSize / 2.0f;
+
+    float squareVertices[] = {
+        // positions                      // texture coords
+        -halfSquareSize, -halfSquareSize, 0.0f, 0.0f, 0.0f,
+         halfSquareSize, -halfSquareSize, 0.0f, 1.0f, 0.0f,
+         halfSquareSize,  halfSquareSize, 0.0f, 1.0f, 1.0f,
+        -halfSquareSize,  halfSquareSize, 0.0f, 0.0f, 1.0f,
+    };
+
+    unsigned int indices[] = {
+        0, 1, 2,
+        2, 3, 0
+    };
+
+    unsigned int VAO, VBO, EBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
     // Draw the chess piece on the specified position
     glBindTexture(GL_TEXTURE_2D, pieceTexture);
     logger.log(LogLevel::FRAME, "Bound piece texture for drawing chess piece: " + std::to_string(pieceTexture));
@@ -83,18 +140,17 @@ void drawChessboard(unsigned int shaderProgram, unsigned int boardTextures[2], u
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "rotation"), 1, GL_FALSE, &rotationMatrix[0][0]);
     logger.log(LogLevel::FRAME, "Set rotation matrix for chess piece.");
 
-    float x = PIECE_POSITION_X * squareSize - 0.5f;
-    float y = PIECE_POSITION_Y * squareSize - 0.5f;
+    float x = col * squareSize - 0.5f;
+    float y = row * squareSize - 0.5f;
     glUniform3f(glGetUniformLocation(shaderProgram, "offset"), x, y, 0.0f);
-    logger.log(LogLevel::FRAME, "Set uniform 'offset' for chess piece at position: (" + 
-               std::to_string(PIECE_POSITION_X) + ", " + std::to_string(PIECE_POSITION_Y) + ")");
+    logger.log(LogLevel::FRAME, "Set uniform 'offset' for chess piece at location: " + location + 
+               " (col: " + std::to_string(col) + ", row: " + std::to_string(row) + ")");
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    logger.log(LogLevel::FRAME, "Drew chess piece at position: (" + std::to_string(PIECE_POSITION_X) + 
-               ", " + std::to_string(PIECE_POSITION_Y) + ")");
+    logger.log(LogLevel::FRAME, "Drew chess piece at location: " + location);
 
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
-    logger.log(LogLevel::FRAME, "Deleted VAO, VBO, and EBO after drawing.");
+    logger.log(LogLevel::FRAME, "Deleted VAO, VBO, and EBO after drawing the chess piece.");
 }
