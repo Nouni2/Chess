@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "log.h"  // Include the logger
+#include "game/pieces/piece.h"
 
 extern Logger logger;  // Use the global logger
 
@@ -81,21 +82,17 @@ void drawChessboard(unsigned int shaderProgram, unsigned int boardTextures[2]) {
     logger.log(LogLevel::FRAME, "Deleted VAO, VBO, and EBO after drawing the chessboard.");
 }
 
-void drawPiece(unsigned int shaderProgram, unsigned int pieceTexture, const std::string& location) {
+void drawPiece(unsigned int shaderProgram, const Piece& piece) {
     static bool firstCall = true;
     if (firstCall) {
         logger.log(LogLevel::TRACE, "drawPiece function called for the first time.");
         firstCall = false;
     }
 
-    if (location.length() != 2 || location[0] < 'a' || location[0] > 'h' || location[1] < '1' || location[1] > '8') {
-        logger.log(LogLevel::ERROR, "Invalid location string: " + location);
-        return;
-    }
-
-    int col = 7 - (location[0] - 'a') ;  // Convert 'a' to 'h' into 0 to 7
-    int row = 7 - (location[1] - '1');  // Convert '1' to '8' into 7 to 0
-
+    // Get the position of the piece
+    std::pair<int, int> position = piece.getPosition();
+    int col = position.first;  // Column index
+    int row = position.second; // Row index
 
     float squareSize = 1.0f / GRID_SIZE;
     float halfSquareSize = squareSize / 2.0f;
@@ -133,8 +130,8 @@ void drawPiece(unsigned int shaderProgram, unsigned int pieceTexture, const std:
     glEnableVertexAttribArray(1);
 
     // Draw the chess piece on the specified position
-    glBindTexture(GL_TEXTURE_2D, pieceTexture);
-    logger.log(LogLevel::FRAME, "Bound piece texture for drawing chess piece: " + std::to_string(pieceTexture));
+    glBindTexture(GL_TEXTURE_2D, piece.getTexture());
+    logger.log(LogLevel::FRAME, "Bound piece texture for drawing chess piece: " + std::to_string(piece.getTexture()));
 
     glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "rotation"), 1, GL_FALSE, &rotationMatrix[0][0]);
@@ -143,11 +140,12 @@ void drawPiece(unsigned int shaderProgram, unsigned int pieceTexture, const std:
     float x = col * squareSize - 0.5f;
     float y = row * squareSize - 0.5f;
     glUniform3f(glGetUniformLocation(shaderProgram, "offset"), x, y, 0.0f);
-    logger.log(LogLevel::FRAME, "Set uniform 'offset' for chess piece at location: " + location + 
-               " (col: " + std::to_string(col) + ", row: " + std::to_string(row) + ")");
+    logger.log(LogLevel::FRAME, std::string("Set uniform 'offset' for chess piece at position: (") + 
+           std::to_string(col) + ", " + std::to_string(row) + ")");
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    logger.log(LogLevel::FRAME, "Drew chess piece at location: " + location);
+    logger.log(LogLevel::FRAME, "Drew chess piece at position: (" + std::to_string(col) + 
+               ", " + std::to_string(row) + ")");
 
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);

@@ -1,9 +1,9 @@
-#ifndef CHESSBOARD_H
-#define CHESSBOARD_H
+#ifndef DRAW_H
+#define DRAW_H
 
-#include <string>
+#include "game/pieces/piece.h" 
 
 void drawChessboard(unsigned int shaderProgram, unsigned int boardTextures[2]);
-void drawPiece(unsigned int shaderProgram, unsigned int pieceTexture, const std::string& location);
+void drawPiece(unsigned int shaderProgram, const Piece& piece);
 
-#endif // CHESSBOARD_H
+#endif // DRAW_H

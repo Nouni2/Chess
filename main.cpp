@@ -6,7 +6,8 @@
 #include "draw.h"
 #include "renderer.h"
 #include "window.h"
-#include "log.h"  // Include the logger
+#include "log.h"
+#include "game/pieces/queen.h"  // Correct path for Queen class
 
 extern Logger logger;  // Use the global logger
 
@@ -64,12 +65,12 @@ int main() {
     }
     logger.log(LogLevel::INFO, "Board textures loaded successfully.");
 
-    unsigned int pieceTexture = loadTexture(PIECE_TEXTURE_PATH);
-    if (!pieceTexture) {
-        logger.log(LogLevel::CRITICAL, "Failed to load piece texture!");
-        return -1;
-    }
-    logger.log(LogLevel::INFO, "Piece texture loaded successfully.");
+    // Create two Queen instances
+    Queen whiteQueen(PieceColor::WHITE);
+    whiteQueen.setPosition("d1"); // Place white queen on d1
+
+    Queen blackQueen(PieceColor::BLACK);
+    blackQueen.setPosition("d8"); // Place black queen on d8
 
     logger.log(LogLevel::DEBUG, "Entering rendering loop...");
     while (!glfwWindowShouldClose(window)) {
@@ -79,9 +80,8 @@ int main() {
 
         drawChessboard(shaderProgram, boardTextures); // Draw the chessboard
 
-        drawPiece(shaderProgram, pieceTexture, "e4"); // Draw the piece at location "e4"
-
-        drawPiece(shaderProgram, pieceTexture, "a1"); // Draw the piece at location "e4"
+        drawPiece(shaderProgram, whiteQueen); // Draw the white queen
+        drawPiece(shaderProgram, blackQueen); // Draw the black queen
 
         updateWindow(window);
         logger.log(LogLevel::FRAME, "Frame displayed and events polled.");
