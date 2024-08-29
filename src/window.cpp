@@ -42,5 +42,5 @@ void updateWindow(GLFWwindow* window) {
     logger.log(LogLevel::TRACE, "Updating window.");
 
     glfwSwapBuffers(window);
-    glfwPollEvents;
+    glfwPollEvents();
 }
