@@ -8,15 +8,10 @@
 #include "window.h"
 #include "log.h"
 #include "gameplay.h"
+#include "viewer.h"
+#include "mouse.h"  // Include the mouse handling header
 
 extern Logger logger;
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    logger.log(LogLevel::INFO, "Framebuffer size changed: " + std::to_string(width) + "x" + std::to_string(height));
-    resizeRenderer(glGetUniformLocation(*(unsigned int*)glfwGetWindowUserPointer(window), "projection"), width, height);
-    setViewport(window);
-    logger.log(LogLevel::TRACE, "Framebuffer size callback executed.");
-}
 
 int main() {
     logger.log(LogLevel::INFO, "Starting application...");
@@ -51,7 +46,9 @@ int main() {
     logger.log(LogLevel::INFO, "Shaders loaded successfully. Shader Program ID: " + std::to_string(shaderProgram));
 
     glfwSetWindowUserPointer(window, &shaderProgram);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    initializeViewport(window);  // Set up the viewport
+    setupMouseCallback(window);  // Set up the mouse callback
 
     initializeRenderer(shaderProgram, window);
     logger.log(LogLevel::INFO, "Renderer initialized.");
