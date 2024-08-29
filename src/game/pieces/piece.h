@@ -9,13 +9,14 @@ enum class PieceColor { WHITE, BLACK };
 
 class Piece {
 public:
-    Piece(PieceColor color, const std::string& texturePath);
+    Piece(PieceColor color, const std::string& texturePath, int score);
     virtual ~Piece() = default;
 
     virtual std::vector<std::pair<int, int>> getLegalMoves(int x, int y) const = 0;
 
     PieceColor getColor() const;
     int getUID() const;
+    int getScore() const; // New getter for the score
     std::pair<int, int> getPosition() const;
     void setPosition(const std::string& pos);
     void setPosition(int x, int y);
@@ -28,6 +29,7 @@ protected:
     PieceColor color;
     std::pair<int, int> position; // Current position on the board (-1,-1) if captured
     unsigned int texture; // OpenGL texture ID for the piece
+    int score; // Score attribute for each piece
 };
 
 #endif // PIECE_H

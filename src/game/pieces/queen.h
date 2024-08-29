@@ -10,9 +10,10 @@ extern Logger logger;
 class Queen : public Piece {
 public:
     Queen(PieceColor color) 
-        : Piece(color, generateTexturePath(color)) {
+        : Piece(color, generateTexturePath(color), 9) { // The queen is worth 9 points 
         logger.log(LogLevel::INFO, "Queen created with UID: " + std::to_string(getUID()) + 
-                   ", Color: " + (color == PieceColor::WHITE ? "White" : "Black"));
+                   ", Color: " + (color == PieceColor::WHITE ? "White" : "Black") + 
+                   ", Score: " + std::to_string(getScore()));
     }
 
     std::vector<std::pair<int, int>> getLegalMoves(int x, int y) const override {

@@ -8,12 +8,13 @@ int Piece::nextUID = 1;
 
 extern Logger logger;
 
-Piece::Piece(PieceColor color, const std::string& texturePath)
-    : color(color), uid(nextUID++), position{-1, -1} {
+Piece::Piece(PieceColor color, const std::string& texturePath, int score)
+    : color(color), uid(nextUID++), position{-1, -1}, score(score) {
     // Load the texture for the piece
     texture = loadTexture(texturePath.c_str());
     logger.log(LogLevel::INFO, "Created piece with UID: " + std::to_string(uid) + ", Color: " + 
-               (color == PieceColor::WHITE ? "White" : "Black") + ", Texture Path: " + texturePath);
+               (color == PieceColor::WHITE ? "White" : "Black") + 
+               ", Texture Path: " + texturePath + ", Score: " + std::to_string(score));
 }
 
 std::pair<int, int> Piece::getPosition() const {
@@ -46,6 +47,10 @@ PieceColor Piece::getColor() const {
 
 int Piece::getUID() const {
     return uid;
+}
+
+int Piece::getScore() const {
+    return score;
 }
 
 unsigned int Piece::getTexture() const {
