@@ -1,8 +1,23 @@
 #include <GLFW/glfw3.h>
 #include "log.h"
 #include "config.h"
+#include "game/pieces/piece.h"    // Include the piece class
+#include "gameplay.h" // Include for access to pieces vector
+#include <iostream>
 
 extern Logger logger;
+extern std::vector<Piece*> pieces; // Access the vector of pieces from gameplay
+
+// Function to find a piece at a given position
+Piece* findPieceAtPosition(int col, int row) {
+    for (auto& piece : pieces) {
+        auto [pieceCol, pieceRow] = piece->getPosition();
+        if (pieceCol == col && pieceRow == row) {
+            return piece;
+        }
+    }
+    return nullptr;
+}
 
 // Callback function to handle mouse button events
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
@@ -36,9 +51,23 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
             std::string square = std::string(1, colChar) + std::to_string(rowNumber);
 
-            // Log the square to the terminal and to the log file
-            std::cout << "Left mouse button clicked on square " << square << std::endl;
-            logger.log(LogLevel::DEBUG, "Left mouse button clicked on square " + square);
+            // Check if the square is occupied
+            Piece* piece = findPieceAtPosition(col, row);
+            if (piece) {
+                // The square is occupied
+                std::string pieceType = typeid(*piece).name(); // You may want to implement a proper type-to-string conversion
+                std::string pieceColor = (piece->getColor() == PieceColor::WHITE) ? "White" : "Black";
+                int pieceUID = piece->getUID();
+
+                std::cout << "Square " << square << " is occupied by a " << pieceColor << " " << pieceType 
+                          << " with UID: " << pieceUID << std::endl;
+                logger.log(LogLevel::DEBUG, "Square " + square + " is occupied by a " + pieceColor + " " + pieceType + 
+                                          " with UID: " + std::to_string(pieceUID));
+            } else {
+                // The square is not occupied
+                std::cout << "Square " << square << " is not occupied." << std::endl;
+                logger.log(LogLevel::DEBUG, "Square " + square + " is not occupied.");
+            }
         } else {
             // Click was outside the chessboard area
             std::cout << "Click was outside the chessboard area." << std::endl;

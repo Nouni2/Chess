@@ -14,7 +14,8 @@ enum class LogLevel {
     INFO,
     DEBUG,
     TRACE,
-    FRAME
+    FRAME,
+    POSITION // Add POSITION log level here (though we will treat it differently)
 };
 
 class Logger {

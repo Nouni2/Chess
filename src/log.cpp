@@ -1,7 +1,7 @@
 #include "log.h"
 
 // Initialize the logger instance
-Logger logger("chess.log");
+Logger logger("logs/debug.log");
 
 // Initialize the logger with the log file name
 Logger::Logger(const std::string& filename) {
@@ -17,6 +17,7 @@ Logger::Logger(const std::string& filename) {
     logLevelNames[LogLevel::DEBUG] = "DEBUG";
     logLevelNames[LogLevel::TRACE] = "TRACE";
     logLevelNames[LogLevel::FRAME] = "FRAME";
+    logLevelNames[LogLevel::POSITION] = "POSITION";  // Add POSITION mapping here
 }
 
 // Destructor to close the log file
@@ -28,7 +29,8 @@ Logger::~Logger() {
 
 // Log a message with the specified log level
 void Logger::log(LogLevel level, const std::string& message) {
-    if (level <= currentLogLevel) {
+    // Always log POSITION level messages
+    if (level == LogLevel::POSITION || level <= currentLogLevel) {
         logFile << getCurrentTime() << " - " << levelToString(level) << " - " << message << std::endl;
         logFile.flush(); // Ensure the message is written to the file immediately
     }

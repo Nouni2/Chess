@@ -5,15 +5,17 @@
 #include "game/pieces/knight.h"
 #include "game/pieces/rook.h"
 #include "game/pieces/pawn.h"
+#include "game/gameplay/gameplay_log.h"
 #include "draw.h"
 #include "log.h"
 
 extern Logger logger;
 
+std::vector<Piece*> pieces;
+
 void setupPieces(std::vector<Piece*>& pieces) {
     logger.log(LogLevel::INFO, "Setting up pieces...");
 
-    // White pieces
     pieces.push_back(new Rook(PieceColor::WHITE));    pieces.back()->setPosition("a1");
     pieces.push_back(new Knight(PieceColor::WHITE));  pieces.back()->setPosition("b1");
     pieces.push_back(new Bishop(PieceColor::WHITE));  pieces.back()->setPosition("c1");
@@ -23,7 +25,6 @@ void setupPieces(std::vector<Piece*>& pieces) {
     pieces.push_back(new Knight(PieceColor::WHITE));  pieces.back()->setPosition("g1");
     pieces.push_back(new Rook(PieceColor::WHITE));    pieces.back()->setPosition("h1");
 
-    // White pawns
     for (char col = 'a'; col <= 'h'; ++col) {
         std::string position(1, col);
         position += '2';
@@ -31,7 +32,6 @@ void setupPieces(std::vector<Piece*>& pieces) {
         pieces.back()->setPosition(position);
     }
 
-    // Black pieces
     pieces.push_back(new Rook(PieceColor::BLACK));    pieces.back()->setPosition("a8");
     pieces.push_back(new Knight(PieceColor::BLACK));  pieces.back()->setPosition("b8");
     pieces.push_back(new Bishop(PieceColor::BLACK));  pieces.back()->setPosition("c8");
@@ -41,7 +41,6 @@ void setupPieces(std::vector<Piece*>& pieces) {
     pieces.push_back(new Knight(PieceColor::BLACK));  pieces.back()->setPosition("g8");
     pieces.push_back(new Rook(PieceColor::BLACK));    pieces.back()->setPosition("h8");
 
-    // Black pawns
     for (char col = 'a'; col <= 'h'; ++col) {
         std::string position(1, col);
         position += '7';
@@ -50,6 +49,7 @@ void setupPieces(std::vector<Piece*>& pieces) {
     }
 
     logger.log(LogLevel::INFO, "All pieces placed on the board.");
+    logPiecePositions(pieces);  // Log the initial positions
 }
 
 void drawAllPieces(unsigned int shaderProgram, const std::vector<Piece*>& pieces) {
