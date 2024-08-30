@@ -9,7 +9,8 @@
 #include "log.h"
 #include "gameplay.h"
 #include "viewer.h"
-#include "mouse.h"  // Include the mouse handling header
+#include "mouse.h"
+#include "input_handler.h" // Include the input handler header
 
 extern Logger logger;
 
@@ -52,6 +53,9 @@ int main() {
 
     initializeRenderer(shaderProgram, window);
     logger.log(LogLevel::INFO, "Renderer initialized.");
+
+    // Set the key callback function for adjusting parameters
+    glfwSetKeyCallback(window, keyCallback);
 
     unsigned int boardTextures[2];
     boardTextures[0] = loadTexture(LIGHT_SQUARE_TEXTURE_PATH);
