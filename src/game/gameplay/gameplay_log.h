@@ -24,4 +24,7 @@ void logMove(const Piece* piece, const std::string& oldPosition, const std::stri
 // Check if a square is occupied and return the piece occupying it
 Piece* getPieceAtPosition(const std::string& position, const std::vector<Piece*>& pieces);
 
+// Function to get a piece type as a string
+std::string getPieceTypeName(const Piece* piece);
+
 #endif // GAMEPLAY_LOG_H

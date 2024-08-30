@@ -18,6 +18,8 @@ Piece::Piece(PieceColor color, const std::string& texturePath, int score)
 }
 
 std::pair<int, int> Piece::getPosition() const {
+    logger.log(LogLevel::FRAME, "Retrieving position for piece with UID: " + std::to_string(uid) + 
+                                " -> (" + std::to_string(position.first) + ", " + std::to_string(position.second) + ")");
     return position;
 }
 
@@ -27,18 +29,18 @@ void Piece::setPosition(const std::string& pos) {
         logger.log(LogLevel::WARNING, "Invalid position string: " + pos + ". Setting piece with UID: " + 
                    std::to_string(uid) + " to off the board.");
     } else {
-        int col = 7 - (pos[0] - 'a'); // Convert 'a' to 'h' into 0 to 7
-        int row = 7 - (pos[1] - '1'); // Convert '1' to '8' into 7 to 0
+        int col = pos[0] - 'a'; // Convert 'a' to 'h' into 0 to 7
+        int row = 8 - (pos[1] - '1') - 1; // Convert '1' to '8' into 7 to 0
         position = {col, row};
         logger.log(LogLevel::INFO, "Set position for piece with UID: " + std::to_string(uid) + " to (" + 
-                   std::to_string(col) + ", " + std::to_string(row) + ").");
+                   std::to_string(col) + ", " + std::to_string(row) + ")");
     }
 }
 
 void Piece::setPosition(int x, int y) {
     position = {x, y};
     logger.log(LogLevel::INFO, "Set position for piece with UID: " + std::to_string(uid) + " to (" + 
-               std::to_string(x) + ", " + std::to_string(y) + ").");
+               std::to_string(x) + ", " + std::to_string(y) + ")");
 }
 
 PieceColor Piece::getColor() const {

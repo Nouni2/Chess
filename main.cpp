@@ -14,6 +14,7 @@
 #include "game/gameplay/gameplay_log.h"  // Include the gameplay log header
 
 extern Logger logger;
+extern std::vector<Piece*> pieces;
 
 int main() {
     logger.log(LogLevel::INFO, "Starting application...");
@@ -82,7 +83,7 @@ int main() {
     logger.log(LogLevel::INFO, "Board textures loaded successfully.");
     gameplayLogger.log(LogLevel::INFO, "Board textures loaded successfully.");
 
-    std::vector<Piece*> pieces;
+    // The pieces vector should be declared and initialized here
     setupPieces(pieces);  // Setup the pieces
     gameplayLogger.log(LogLevel::INFO, "Pieces setup completed.");
 
@@ -98,6 +99,9 @@ int main() {
         drawChessboard(shaderProgram, boardTextures); // Draw the chessboard
 
         drawAllPieces(shaderProgram, pieces);  // Draw all the pieces
+
+        // Call mouse button callback only when rendering the pieces
+        glfwPollEvents();
 
         updateWindow(window);
         logger.log(LogLevel::FRAME, "Frame displayed and events polled.");

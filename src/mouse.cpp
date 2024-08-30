@@ -1,23 +1,38 @@
 #include <GLFW/glfw3.h>
 #include "log.h"
 #include "config.h"
-#include "game/pieces/piece.h"    // Include the piece class
-#include "gameplay.h" // Include for access to pieces vector
+#include "game/pieces/piece.h"  
+#include "game/gameplay/gameplay_log.h"  // Include the gameplay log for getPieceTypeName
+#include "gameplay.h"  // Include for access to pieces vector
 #include <iostream>
 
 extern Logger logger;
 extern std::vector<Piece*> pieces; // Access the vector of pieces from gameplay
 
+
 // Function to find a piece at a given position
 Piece* findPieceAtPosition(int col, int row) {
+    logger.log(LogLevel::DEBUG, "Searching for piece at position (" + std::to_string(col) + ", " + std::to_string(row) + ")");
+    
+    // Log the number of elements in the pieces vector
+    logger.log(LogLevel::DEBUG, "Number of pieces in vector: " + std::to_string(pieces.size()));
     for (auto& piece : pieces) {
+        logger.log(LogLevel::DEBUG, "Entering piece position checking loop");
         auto [pieceCol, pieceRow] = piece->getPosition();
+        logger.log(LogLevel::DEBUG, "Checking piece with UID: " + std::to_string(piece->getUID()) + 
+                                    " at position (" + std::to_string(pieceCol) + ", " + std::to_string(pieceRow) + ")");
+        
         if (pieceCol == col && pieceRow == row) {
+            logger.log(LogLevel::DEBUG, "Piece found at position (" + std::to_string(col) + ", " + std::to_string(row) + 
+                                        ") with UID: " + std::to_string(piece->getUID()));
             return piece;
         }
     }
+    
+    logger.log(LogLevel::DEBUG, "No piece found at position (" + std::to_string(col) + ", " + std::to_string(row) + ")");
     return nullptr;
 }
+
 
 // Callback function to handle mouse button events
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
@@ -55,7 +70,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
             Piece* piece = findPieceAtPosition(col, row);
             if (piece) {
                 // The square is occupied
-                std::string pieceType = typeid(*piece).name(); // You may want to implement a proper type-to-string conversion
+                std::string pieceType = getPieceTypeName(piece);  // Use the function correctly
                 std::string pieceColor = (piece->getColor() == PieceColor::WHITE) ? "White" : "Black";
                 int pieceUID = piece->getUID();
 
