@@ -51,7 +51,6 @@ void setupPieces(std::vector<Piece*>& pieces) {
     }
 
     logger.log(LogLevel::INFO, "All pieces placed on the board.");
-    logPiecePositions(pieces);  // Log the initial positions of all pieces
 }
 
 void drawAllPieces(unsigned int shaderProgram, const std::vector<Piece*>& pieces) {

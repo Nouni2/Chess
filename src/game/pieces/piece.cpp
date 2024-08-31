@@ -2,6 +2,8 @@
 #include "config.h"
 #include "texture.h"
 #include "log.h"
+#include "mouse.h"
+
 
 // Initialize the static member for tracking unique IDs
 int Piece::nextUID = 1;
@@ -58,3 +60,56 @@ int Piece::getScore() const {
 unsigned int Piece::getTexture() const {
     return texture;
 }
+
+// Non-static method to check if the movement is legal
+bool Piece::isMovementLegal(int x, int y, const std::vector<Piece*>& pieces) const {
+
+    // Check if the move is within the board boundaries
+    bool isWithinBoard = x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE;
+    if (!isWithinBoard) {
+        return false;
+    }
+
+    // Check if the piece is a knight
+    std::string pieceType = typeid(*this).name();
+    bool isKnight = pieceType.find("Knight") != std::string::npos;
+
+    if (!isKnight) {
+        // Determine the direction of movement
+        int dx = (x > position.first) ? 1 : (x < position.first) ? -1 : 0;
+        int dy = (y > position.second) ? 1 : (y < position.second) ? -1 : 0;
+
+        // Check all squares in the path between the current position and the destination
+        int currentX = position.first + dx;
+        int currentY = position.second + dy;
+        while (currentX != x || currentY != y) {
+            if (findPieceAtPosition(currentX, currentY, pieces)) {
+                return false; // Path is blocked
+            }
+            currentX += dx;
+            currentY += dy;
+        }
+    }
+
+    // Check if the square is occupied
+    Piece* occupyingPiece = findPieceAtPosition(x, y, pieces);
+
+    // Check if the square is empty or occupied by an opponent's piece
+    bool isSquareEmpty = (occupyingPiece == nullptr);
+    bool isCaptureMove = false;
+
+    if (!isSquareEmpty) {
+        if (occupyingPiece->getColor() == this->getColor()) {
+            // Square is occupied by a piece of the same color, so the move is illegal
+            return false;
+        } else {
+            // Square is occupied by an opponent's piece, so it can be a capture move
+            isCaptureMove = true;
+        }
+    }
+
+    // Placeholder for checking if the move puts the king in check
+    bool doesNotPutKingInCheck = true; // Will be implemented later
+    return (isSquareEmpty || isCaptureMove) && doesNotPutKingInCheck;
+}
+

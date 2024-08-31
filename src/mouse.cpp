@@ -16,7 +16,7 @@ std::string selectedPieceOldPosition;
 std::vector<std::pair<int, int>> legalMoves;
 
 // Function to find a piece at a given position
-Piece* findPieceAtPosition(int col, int row) {
+Piece* findPieceAtPosition(int col, int row, const std::vector<Piece*>& pieces) {
     for (auto& piece : pieces) {
         auto [pieceCol, pieceRow] = piece->getPosition();
         if (pieceCol == col && pieceRow == row) {
@@ -46,16 +46,18 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
             int row = static_cast<int>((ypos - marginY) / squareSize);
 
             if (selectedPiece == nullptr) {
-                selectedPiece = findPieceAtPosition(col, row);
+                selectedPiece = findPieceAtPosition(col, row, pieces);
                 if (selectedPiece) {
                     selectedPieceOldPosition = std::string(1, 'a' + col) + std::to_string(8 - row);
                     legalMoves = selectedPiece->getLegalMoves(col, row);
 
                     // Log selected piece info
-                    logger.log(LogLevel::DEBUG, "Selected " + getPieceTypeName(selectedPiece) + " with UID: " + std::to_string(selectedPiece->getUID()) +
-                                                " at position: " + selectedPieceOldPosition);
-                    gameplayLogger.log(LogLevel::POSITION, "Selected " + getPieceTypeName(selectedPiece) + " with UID: " + std::to_string(selectedPiece->getUID()) +
-                                                    " at position: " + selectedPieceOldPosition);
+                    std::string pieceColor = (selectedPiece->getColor() == PieceColor::WHITE) ? "White" : "Black";
+                    logger.log(LogLevel::DEBUG, "Selected " + pieceColor + " " + getPieceTypeName(selectedPiece) + " with UID: " + std::to_string(selectedPiece->getUID()) +
+                           " at position: " + selectedPieceOldPosition);
+                    gameplayLogger.log(LogLevel::POSITION, "Selected " + pieceColor + " " + getPieceTypeName(selectedPiece) + " with UID: " + std::to_string(selectedPiece->getUID()) +
+                                     " at position: " + selectedPieceOldPosition);
+
                 }
             } else {
                 bool isLegalMove = std::find(legalMoves.begin(), legalMoves.end(), std::make_pair(col, row)) != legalMoves.end();

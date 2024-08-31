@@ -9,6 +9,5 @@ extern std::vector<std::pair<int, int>> legalMoves;
 
 // Function to set up the mouse callback
 void setupMouseCallback(GLFWwindow* window);
-Piece* findPieceAtPosition(int col, int row);
-
+Piece* findPieceAtPosition(int col, int row, const std::vector<Piece*>& pieces);
 #endif // MOUSE_H

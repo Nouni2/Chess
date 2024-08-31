@@ -5,8 +5,10 @@
 #include "config.h"
 #include "log.h"
 #include <limits>
+#include <algorithm>
 
 extern Logger logger;
+extern std::vector<Piece*> pieces;  // Extern declaration of the pieces vector
 
 class King : public Piece {
 public:
@@ -22,7 +24,14 @@ public:
             {x + 1, y + 1}, {x - 1, y - 1}, {x + 1, y - 1}, {x - 1, y + 1}
         };
 
+        // Filter out illegal moves
+        moves.erase(std::remove_if(moves.begin(), moves.end(),
+            [&](const std::pair<int, int>& move) {
+                return !isMovementLegal(move.first, move.second, pieces);
+            }), moves.end());
+
         logger.log(LogLevel::DEBUG, "Calculated legal moves for King with UID: " + std::to_string(getUID()) +
+                   ", Color: " + (getColor() == PieceColor::WHITE ? "White" : "Black") +
                    " from position (" + std::to_string(x) + ", " + std::to_string(y) + ").");
 
         return moves;

@@ -6,6 +6,7 @@
 #include "log.h"
 
 extern Logger logger;
+extern std::vector<Piece*> pieces;  // Extern declaration of the pieces vector
 
 class Rook : public Piece {
 public:
@@ -18,14 +19,15 @@ public:
     std::vector<std::pair<int, int>> getLegalMoves(int x, int y) const override {
         std::vector<std::pair<int, int>> moves;
 
-        for (int i = 1; i < 8; ++i) {
-            moves.push_back({x + i, y});
-            moves.push_back({x - i, y});
-            moves.push_back({x, y + i});
-            moves.push_back({x, y - i});
+        for (int i = 1; i < GRID_SIZE; ++i) {
+            if (isMovementLegal(x + i, y, pieces)) moves.push_back({x + i, y});
+            if (isMovementLegal(x - i, y, pieces)) moves.push_back({x - i, y});
+            if (isMovementLegal(x, y + i, pieces)) moves.push_back({x, y + i});
+            if (isMovementLegal(x, y - i, pieces)) moves.push_back({x, y - i});
         }
 
         logger.log(LogLevel::DEBUG, "Calculated legal moves for Rook with UID: " + std::to_string(getUID()) +
+                   " and color: " + (getColor() == PieceColor::WHITE ? "White" : "Black") +
                    " from position (" + std::to_string(x) + ", " + std::to_string(y) + ").");
 
         return moves;

@@ -4,6 +4,7 @@
 #include <vector>
 #include <utility> // for std::pair
 #include <string>
+#include <algorithm>
 
 enum class PieceColor { WHITE, BLACK };
 
@@ -16,7 +17,7 @@ public:
 
     PieceColor getColor() const;
     int getUID() const;
-    int getScore() const; // New getter for the score
+    int getScore() const;
     std::pair<int, int> getPosition() const;
     void setPosition(const std::string& pos);
     void setPosition(int x, int y);
@@ -24,6 +25,8 @@ public:
     unsigned int getTexture() const;
 
 protected:
+    bool isMovementLegal(int x, int y, const std::vector<Piece*>& pieces) const;
+
     static int nextUID; // Static member to keep track of UIDs
     int uid; // Unique ID for the piece
     PieceColor color;

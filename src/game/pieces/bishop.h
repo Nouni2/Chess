@@ -4,8 +4,10 @@
 #include "piece.h"
 #include "config.h"
 #include "log.h"
+#include <vector>
 
 extern Logger logger;
+extern std::vector<Piece*> pieces;  // Extern declaration of the pieces vector
 
 class Bishop : public Piece {
 public:
@@ -18,14 +20,15 @@ public:
     std::vector<std::pair<int, int>> getLegalMoves(int x, int y) const override {
         std::vector<std::pair<int, int>> moves;
 
-        for (int i = 1; i < 8; ++i) {
-            moves.push_back({x + i, y + i});
-            moves.push_back({x - i, y - i});
-            moves.push_back({x + i, y - i});
-            moves.push_back({x - i, y + i});
+        for (int i = 1; i < GRID_SIZE; ++i) {
+            if (isMovementLegal(x + i, y + i, pieces)) moves.push_back({x + i, y + i});
+            if (isMovementLegal(x - i, y - i, pieces)) moves.push_back({x - i, y - i});
+            if (isMovementLegal(x + i, y - i, pieces)) moves.push_back({x + i, y - i});
+            if (isMovementLegal(x - i, y + i, pieces)) moves.push_back({x - i, y + i});
         }
 
         logger.log(LogLevel::DEBUG, "Calculated legal moves for Bishop with UID: " + std::to_string(getUID()) +
+                   " and color: " + (getColor() == PieceColor::WHITE ? "White" : "Black") +
                    " from position (" + std::to_string(x) + ", " + std::to_string(y) + ").");
 
         return moves;
