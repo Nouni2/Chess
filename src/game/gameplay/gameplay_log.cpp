@@ -75,20 +75,3 @@ void logPiecePositions(const std::vector<Piece*>& pieces) {
     }
     gameplayLogger.log(LogLevel::INFO, "Initial piece positions logged.");
 }
-
-// Function to get a piece at a specific position
-Piece* getPieceAtPosition(const std::string& position, const std::vector<Piece*>& pieces) {
-    for (const auto& piece : pieces) {
-        auto [col, row] = piece->getPosition();
-        if (col != -1 && row != -1) { // Valid position
-            char colChar = 'a' + col;
-            int rowNumber = 8 - row;
-            std::string piecePosition = std::string(1, colChar) + std::to_string(rowNumber);
-
-            if (piecePosition == position) {
-                return piece;
-            }
-        }
-    }
-    return nullptr;
-}

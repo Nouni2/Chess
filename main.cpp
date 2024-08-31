@@ -9,12 +9,12 @@
 #include "log.h"
 #include "gameplay.h"
 #include "viewer.h"
-#include "mouse.h"
+#include "mouse.h"  // Include mouse for callback setup
 #include "input_handler.h"
-#include "game/gameplay/gameplay_log.h"  // Include the gameplay log header
+#include "game/gameplay/gameplay_log.h"
 
 extern Logger logger;
-extern std::vector<Piece*> pieces;
+extern std::vector<Piece*> pieces;  // Define the global pieces vector
 
 int main() {
     logger.log(LogLevel::INFO, "Starting application...");
@@ -83,29 +83,22 @@ int main() {
     logger.log(LogLevel::INFO, "Board textures loaded successfully.");
     gameplayLogger.log(LogLevel::INFO, "Board textures loaded successfully.");
 
-    // The pieces vector should be declared and initialized here
-    setupPieces(pieces);  // Setup the pieces
+    // Setup the pieces
+    setupPieces(pieces);
+    logPiecePositions(pieces);  // Log the initial positions of the pieces
     gameplayLogger.log(LogLevel::INFO, "Pieces setup completed.");
 
     logger.log(LogLevel::DEBUG, "Entering rendering loop...");
     gameplayLogger.log(LogLevel::DEBUG, "Entering rendering loop...");
 
     while (!glfwWindowShouldClose(window)) {
-        logger.log(LogLevel::FRAME, "Rendering frame...");
-        gameplayLogger.log(LogLevel::FRAME, "Rendering frame...");
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        drawChessboard(shaderProgram, boardTextures); // Draw the chessboard
-
+        drawChessboard(shaderProgram, boardTextures, legalMoves); // Draw the chessboard with possible moves highlighted
         drawAllPieces(shaderProgram, pieces);  // Draw all the pieces
 
-        // Call mouse button callback only when rendering the pieces
         glfwPollEvents();
-
         updateWindow(window);
-        logger.log(LogLevel::FRAME, "Frame displayed and events polled.");
-        gameplayLogger.log(LogLevel::FRAME, "Frame displayed and events polled.");
     }
 
     // Cleanup dynamically allocated pieces

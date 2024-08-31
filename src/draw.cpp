@@ -3,12 +3,15 @@
 #include "config.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "log.h"  // Include the logger
+#include <iostream>
+#include <algorithm> // Required for std::find_if
+#include "log.h"
 #include "game/pieces/piece.h"
+#include "mouse.h"  // Include the mouse.h for interaction with mouse events
 
-extern Logger logger;  // Use the global logger
+extern Logger logger;
 
-void drawChessboard(unsigned int shaderProgram, unsigned int boardTextures[2]) {
+void drawChessboard(unsigned int shaderProgram, unsigned int boardTextures[2], const std::vector<std::pair<int, int>>& legalMoves) {
     static bool firstCall = true;
     static unsigned int VAO, VBO, EBO;
 
@@ -16,12 +19,10 @@ void drawChessboard(unsigned int shaderProgram, unsigned int boardTextures[2]) {
         logger.log(LogLevel::TRACE, "drawChessboard function called for the first time.");
         firstCall = false;
 
-        // Adjust the size of each square to fit the grid size properly
         float squareSize = 1.0f / GRID_SIZE;
         float halfSquareSize = squareSize / 2.0f;
 
         float squareVertices[] = {
-            // positions                      // texture coords
             -halfSquareSize, -halfSquareSize, 0.0f, 0.0f, 0.0f,
              halfSquareSize, -halfSquareSize, 0.0f, 1.0f, 0.0f,
              halfSquareSize,  halfSquareSize, 0.0f, 1.0f, 1.0f,
@@ -51,44 +52,41 @@ void drawChessboard(unsigned int shaderProgram, unsigned int boardTextures[2]) {
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
 
-        // Ensure texture wrapping is set to avoid black borders
         for (int i = 0; i < 2; i++) {
             glBindTexture(GL_TEXTURE_2D, boardTextures[i]);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         }
 
-        glBindVertexArray(0);  // Unbind VAO for now
+        glBindVertexArray(0);
     }
 
-    // Draw the chessboard (GRID_SIZE x GRID_SIZE grid)
     for (int i = 0; i < GRID_SIZE; i++) {
         for (int j = 0; j < GRID_SIZE; j++) {
-            int textureIndex = (i + j) % 2; // Alternate between light and dark squares
+            int textureIndex = (i + j) % 2;
             glBindTexture(GL_TEXTURE_2D, boardTextures[textureIndex]);
-            logger.log(LogLevel::FRAME, "Bound texture for square (" + std::to_string(i) + 
-                       ", " + std::to_string(j) + "): " + std::to_string(boardTextures[textureIndex]));
 
             glUseProgram(shaderProgram);
             glBindVertexArray(VAO);
 
-            // Calculate the position for each square
-            float x = j * (1.0f / GRID_SIZE) - 0.5f;  // Keep the grid centered
-            float y = i * (1.0f / GRID_SIZE) - 0.5f;  // Keep the grid centered
+            // Apply horizontal mirroring directly in the offset calculation
+            float x = (GRID_SIZE - 1 - j) * (1.0f / GRID_SIZE) - 0.5f;
+            float y = i * (1.0f / GRID_SIZE) - 0.5f;
 
-            // Apply the calculated offset
             glUniform3f(glGetUniformLocation(shaderProgram, "offset"), x, y, 0.0f);
-            logger.log(LogLevel::FRAME, "Set uniform 'offset' for square (" + 
-                       std::to_string(i) + ", " + std::to_string(j) + "): (" + 
-                       std::to_string(x) + ", " + std::to_string(y) + ", 0.0)");
+
+            // Check if the square is part of the legal moves using the mirrored j
+            auto it = std::find_if(legalMoves.begin(), legalMoves.end(), [&](const std::pair<int, int>& move) {
+                return move.first == j && move.second == i;
+            });
+            bool isHighlighted = it != legalMoves.end();
+            glUniform1i(glGetUniformLocation(shaderProgram, "highlight"), isHighlighted ? 1 : 0);
 
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-            logger.log(LogLevel::FRAME, "Drew square (" + std::to_string(i) + 
-                       ", " + std::to_string(j) + ") with texture: " + std::to_string(boardTextures[textureIndex]));
         }
     }
 
-    glBindVertexArray(0);  // Unbind VAO after drawing
+    glBindVertexArray(0);
 }
 
 
@@ -99,10 +97,9 @@ void drawPiece(unsigned int shaderProgram, const Piece& piece) {
         firstCall = false;
     }
 
-    // Get the position of the piece
     std::pair<int, int> position = piece.getPosition();
-    int col = position.first;  // Column index
-    int row = position.second; // Row index
+    int col = GRID_SIZE - 1 - position.first;
+    int row = position.second;
 
     float squareSize = 1.0f / GRID_SIZE;
     float halfSquareSize = squareSize / 2.0f;
@@ -110,7 +107,6 @@ void drawPiece(unsigned int shaderProgram, const Piece& piece) {
     float scaleFactor = PIECE_SCALING_FACTOR;
 
     float squareVertices[] = {
-        // positions (scaled)             // texture coords
         -halfSquareSize * scaleFactor, -halfSquareSize * scaleFactor, 0.0f, 0.0f, 0.0f,
          halfSquareSize * scaleFactor, -halfSquareSize * scaleFactor, 0.0f, 1.0f, 0.0f,
          halfSquareSize * scaleFactor,  halfSquareSize * scaleFactor, 0.0f, 1.0f, 1.0f,
@@ -141,7 +137,6 @@ void drawPiece(unsigned int shaderProgram, const Piece& piece) {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // Draw the chess piece on the specified position
     glBindTexture(GL_TEXTURE_2D, piece.getTexture());
     logger.log(LogLevel::FRAME, "Bound piece texture for drawing chess piece: " + std::to_string(piece.getTexture()));
 
@@ -149,6 +144,7 @@ void drawPiece(unsigned int shaderProgram, const Piece& piece) {
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "rotation"), 1, GL_FALSE, &rotationMatrix[0][0]);
     logger.log(LogLevel::FRAME, "Set rotation matrix for chess piece.");
 
+    // Adjust the offset to reflect the corrected piece position
     float x = col * squareSize - 0.5f;
     float y = row * squareSize - 0.5f;
     glUniform3f(glGetUniformLocation(shaderProgram, "offset"), x, y, 0.0f);
