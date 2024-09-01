@@ -60,7 +60,3 @@ void drawAllPieces(unsigned int shaderProgram, const std::vector<Piece*>& pieces
         drawPiece(shaderProgram, *piece);
     }
 }
-
-void handleMove(Piece* piece, int x, int y) {
-    movePiece(piece, x, y);  // Use the movePiece function from logic.cpp
-}
