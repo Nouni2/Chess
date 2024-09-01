@@ -5,7 +5,10 @@
 #include "mouse.h"
 #include "sound.h"
 #include "game/logic/logic.h"
+#include "game/logic/capture.h" 
+#include "game/gameplay/gameplay_log.h"
 #include "sandbox.h"  // Include for sandbox mode logic
+
 
 // Initialize the static member for tracking unique IDs
 int Piece::nextUID = 1;
@@ -78,7 +81,7 @@ unsigned int Piece::getTexture() const {
     return texture;
 }
 
-// Non-static method to check if the movement is legal
+// Method to check if the movement is legal
 bool Piece::isMovementLegal(int x, int y, const std::vector<Piece*>& pieces) const {
 
     // Check if the move is within the board boundaries
@@ -150,4 +153,48 @@ bool Piece::isMovementLegal(int x, int y, const std::vector<Piece*>& pieces) con
     // Placeholder for checking if the move puts the king in check
     bool doesNotPutKingInCheck = true; // Will be implemented later
     return (isSquareEmpty || isCaptureMove) && doesNotPutKingInCheck;
+}
+
+
+std::vector<Piece*> Piece::capturedPiecesWhite;
+std::vector<Piece*> Piece::capturedPiecesBlack;
+
+void Piece::destroyPiece(const std::vector<Piece*>& pieces) {
+    for (auto& piece : pieces) {
+        if (piece->getUID() == this->uid) {
+            std::pair<int, int> position = piece->getPosition();
+
+            // Move the piece off the board
+            piece->setPosition(-1, -1);
+
+            // Add the piece to the appropriate captured pieces vector
+            if (piece->getColor() == PieceColor::WHITE) {
+                capturedPiecesWhite.push_back(piece);
+                logger.log(LogLevel::INFO, "White piece captured and added to Black's collection.");
+            } else {
+                capturedPiecesBlack.push_back(piece);
+                logger.log(LogLevel::INFO, "Black piece captured and added to White's collection.");
+            }
+
+            gameplayLogger.log(LogLevel::POSITION, "Piece captured: UID " + std::to_string(uid) +
+                                                 ", Color: " + (piece->getColor() == PieceColor::WHITE ? "White" : "Black") +
+                                                 ", Position: (" + std::to_string(position.first) + ", " + std::to_string(position.second) + ")");
+
+            // Play capture sound
+            static Sound captureSound;
+            static bool captureSoundLoaded = false;
+
+            if (!captureSoundLoaded) {
+                if (captureSound.load("assets/soundfx/capture.wav")) {
+                    logger.log(LogLevel::INFO, "Capture sound loaded successfully.");
+                } else {
+                    logger.log(LogLevel::ERROR, "Failed to load capture sound.");
+                }
+                captureSoundLoaded = true;
+            }
+
+            captureSound.play();
+            break;
+        }
+    }
 }

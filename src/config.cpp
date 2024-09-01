@@ -15,12 +15,13 @@ bool showWhiteLegalMoves = true;
 bool showBlackLegalMoves = true;
 
 // Initialize the global sandbox mode variable
-bool sandboxMode = true;
+bool sandboxMode = false;
 
 // Define the resolution and whether shadows are used
 const bool USE_SHADOW = true;  // True for shadowed pieces
 const int RESOLUTION = 512;    // Use 512px resolution; 
 const float PIECE_SCALING_FACTOR = 0.8f; // Adjust the scaling factor (1.0 is the standard size)
+const float CAPTURED_PIECE_SCALING_FACTOR = 0.2f;
 
 // Determine the shadow folder and resolution folder
 const std::string shadowFolder = USE_SHADOW ? "With Shadow" : "No Shadow";

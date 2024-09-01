@@ -4,9 +4,13 @@
 #include "piece.h"
 #include "config.h"
 #include "log.h"
+#include "gameplay.h"  // Include gameplay logging
+#include "game/logic/capture.h" // Include for capture logic
+#include "mouse.h" // Include for findPieceAtPosition
 
 extern Logger logger;
 extern std::vector<Piece*> pieces;  // Extern declaration of the pieces vector
+extern Logger gameplayLogger;  // Extern declaration of the gameplay logger
 
 class Pawn : public Piece {
 public:
@@ -21,31 +25,37 @@ public:
 
         int direction = (getColor() == PieceColor::WHITE) ? 1 : -1;  // Positive for white (up), negative for black (down)
 
-        // Forward move: Check if the move is within board limits
-        if (isMovementLegal(x, y - direction, pieces)) {
+        // Forward move: Check if the move is within board limits and the path is not blocked
+        if (isMovementLegal(x, y - direction, pieces) && !findPieceAtPosition(x, y - direction, pieces)) {
             moves.push_back({x, y - direction});
         }
 
         // Double forward move if on starting position
         if ((getColor() == PieceColor::WHITE && y == 6) || (getColor() == PieceColor::BLACK && y == 1)) {
-            if (isMovementLegal(x, y - 2 * direction, pieces)) {
+            if (isMovementLegal(x, y - 2 * direction, pieces) && !findPieceAtPosition(x, y - direction, pieces) && !findPieceAtPosition(x, y - 2 * direction, pieces)) {
                 moves.push_back({x, y - 2 * direction});
             }
         }
 
         // Capture moves
-        /*
-        bool canCapture = false;  // This will be set by game logic later
+        bool canCaptureLeft = isCapturePossible(x - 1, y - direction);
+        bool canCaptureRight = isCapturePossible(x + 1, y - direction);
 
-        if (canCapture) {
-            if (isMovementLegal(x + 1, y - direction, pieces)) {
+        if (canCaptureLeft) {
+            moves.push_back({x - 1, y - direction});
+        }
+        if (canCaptureRight) {
+            moves.push_back({x + 1, y - direction});
+        }
+
+        // Handle en passant
+        if (isEnPassantCapture(x, y, direction)) {
+            if (findPieceAtPosition(x + 1, y - direction, pieces)) {
                 moves.push_back({x + 1, y - direction});
-            }
-            if (isMovementLegal(x - 1, y - direction, pieces)) {
+            } else if (findPieceAtPosition(x - 1, y - direction, pieces)) {
                 moves.push_back({x - 1, y - direction});
             }
         }
-        */
 
         logger.log(LogLevel::DEBUG, "Calculated legal moves for Pawn with UID: " + std::to_string(getUID()) +
                    ", Color: " + (getColor() == PieceColor::WHITE ? "White" : "Black") +
@@ -61,6 +71,16 @@ private:
         std::string texturePath = "assets/" + shadowFolder + "/" + resolutionFolder + "/" + colorPrefix + "pawn.png";
         logger.log(LogLevel::INFO, "Generated texture path for Pawn: " + texturePath);
         return texturePath;
+    }
+
+    bool isCapturePossible(int targetX, int targetY) const {
+        Piece* targetPiece = findPieceAtPosition(targetX, targetY, pieces);
+        return targetPiece && targetPiece->getColor() != getColor();
+    }
+
+    bool isEnPassantCapture(int x, int y, int direction) const {
+        // Placeholder logic, returns false to prevent issues
+        return false;
     }
 };
 

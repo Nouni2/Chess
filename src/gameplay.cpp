@@ -11,6 +11,7 @@
 #include "game/gameplay/gameplay_log.h"
 
 std::vector<Piece*> pieces;
+LastMove lastMove;
 
 extern Logger logger;
 

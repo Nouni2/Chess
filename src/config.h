@@ -27,6 +27,7 @@ extern const int GRID_SIZE;
 
 // Scaling factor for pieces
 extern const float PIECE_SCALING_FACTOR;
+extern const float CAPTURED_PIECE_SCALING_FACTOR;
 
 // Booleans to control the display of legal moves for each player
 extern bool showWhiteLegalMoves;
