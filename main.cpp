@@ -1,5 +1,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <chrono>  // Include chrono for timing
 #include "config.h"
 #include "shaders.h"
 #include "texture.h"
@@ -91,6 +92,9 @@ int main() {
     logger.log(LogLevel::DEBUG, "Entering rendering loop...");
     gameplayLogger.log(LogLevel::DEBUG, "Entering rendering loop...");
 
+    auto startTime = std::chrono::high_resolution_clock::now();
+    int frameCount = 0;
+
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -99,6 +103,21 @@ int main() {
 
         glfwPollEvents();
         updateWindow(window);
+
+        // FPS calculation and display
+        if (showFPS) {
+            frameCount++;
+            auto currentTime = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<float> duration = currentTime - startTime;
+
+            if (duration.count() >= 1.0f) {
+                float fps = frameCount / duration.count();
+                std::string windowTitle = "Chessboard - FPS: " + std::to_string(fps);
+                glfwSetWindowTitle(window, windowTitle.c_str());
+                frameCount = 0;
+                startTime = currentTime;
+            }
+        }
     }
 
     // Cleanup dynamically allocated pieces

@@ -14,8 +14,9 @@ const char* FRAGMENT_SHADER_PATH = "shaders/fragment_shader.glsl";
 bool showWhiteLegalMoves = true;
 bool showBlackLegalMoves = true;
 
+bool showFPS = true; // Flag to whether or not show the in game FPS  
 // Initialize the global sandbox mode variable
-bool sandboxMode = false;
+bool sandboxMode = true;
 
 // Define the resolution and whether shadows are used
 const bool USE_SHADOW = true;  // True for shadowed pieces
