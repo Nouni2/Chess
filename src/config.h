@@ -28,8 +28,14 @@ extern const int GRID_SIZE;
 // Scaling factor for pieces
 extern const float PIECE_SCALING_FACTOR;
 
-// Boolean to control the display of legal moves
-extern bool showLegalMoves;  
+// Booleans to control the display of legal moves for each player
+extern bool showWhiteLegalMoves;
+extern bool showBlackLegalMoves;
+
+
+// Global sandbox mode control
+extern bool sandboxMode;
+
 
 // Function to log the configuration values
 void logConfigValues();

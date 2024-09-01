@@ -4,8 +4,8 @@
 #include "log.h"
 #include "mouse.h"
 #include "sound.h"
-
-
+#include "game/logic/logic.h"
+#include "sandbox.h"  // Include for sandbox mode logic
 
 // Initialize the static member for tracking unique IDs
 int Piece::nextUID = 1;
@@ -62,7 +62,6 @@ void Piece::setPosition(int x, int y) {
     moveSound.play();
 }
 
-
 PieceColor Piece::getColor() const {
     return color;
 }
@@ -91,9 +90,31 @@ bool Piece::isMovementLegal(int x, int y, const std::vector<Piece*>& pieces) con
     // Check if the piece is a knight
     std::string pieceType = typeid(*this).name();
     bool isKnight = pieceType.find("Knight") != std::string::npos;
+    bool isPawn = pieceType.find("Pawn") != std::string::npos;
 
-    if (!isKnight) {
+    if (isPawn) {
         // Determine the direction of movement
+        int direction = (getColor() == PieceColor::WHITE) ? 1 : -1;
+
+        // Check if the move is a forward move
+        if (x == position.first) {
+            // Forward move: check if the square is occupied
+            Piece* occupyingPiece = findPieceAtPosition(x, y, pieces);
+            if (occupyingPiece) {
+                return false; // Path is blocked
+            }
+        } else if (abs(x - position.first) == 1 && y == position.second + direction) {
+            // Diagonal move: check if the square is occupied by an opponent's piece
+            Piece* occupyingPiece = findPieceAtPosition(x, y, pieces);
+            if (!occupyingPiece || occupyingPiece->getColor() == this->getColor()) {
+                return false; // Can't capture in this case
+            }
+        } else {
+            // Invalid pawn move
+            return false;
+        }
+    } else if (!isKnight) {
+        // Determine the direction of movement for other pieces
         int dx = (x > position.first) ? 1 : (x < position.first) ? -1 : 0;
         int dy = (y > position.second) ? 1 : (y < position.second) ? -1 : 0;
 
@@ -130,4 +151,3 @@ bool Piece::isMovementLegal(int x, int y, const std::vector<Piece*>& pieces) con
     bool doesNotPutKingInCheck = true; // Will be implemented later
     return (isSquareEmpty || isCaptureMove) && doesNotPutKingInCheck;
 }
-

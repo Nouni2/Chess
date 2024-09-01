@@ -1,9 +1,10 @@
 #include <GLFW/glfw3.h>
 #include "log.h"
 #include "config.h"
-#include "game/pieces/piece.h"  
-#include "game/gameplay/gameplay_log.h"
+#include "game/pieces/piece.h"
 #include "gameplay.h"
+#include "game/gameplay/gameplay_log.h" 
+#include "game/logic/logic.h"
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -47,25 +48,23 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
             if (selectedPiece == nullptr) {
                 selectedPiece = findPieceAtPosition(col, row, pieces);
-                if (selectedPiece) {
+                if (selectedPiece && isTurnValid(selectedPiece->getColor())) {
                     selectedPieceOldPosition = std::string(1, 'a' + col) + std::to_string(8 - row);
                     legalMoves = selectedPiece->getLegalMoves(col, row);
 
                     // Log selected piece info
                     std::string pieceColor = (selectedPiece->getColor() == PieceColor::WHITE) ? "White" : "Black";
                     logger.log(LogLevel::DEBUG, "Selected " + pieceColor + " " + getPieceTypeName(selectedPiece) + " with UID: " + std::to_string(selectedPiece->getUID()) +
-                           " at position: " + selectedPieceOldPosition);
+                               " at position: " + selectedPieceOldPosition);
                     gameplayLogger.log(LogLevel::POSITION, "Selected " + pieceColor + " " + getPieceTypeName(selectedPiece) + " with UID: " + std::to_string(selectedPiece->getUID()) +
-                                     " at position: " + selectedPieceOldPosition);
-
+                                       " at position: " + selectedPieceOldPosition);
                 }
             } else {
+                // Check if the selected move is legal
                 bool isLegalMove = std::find(legalMoves.begin(), legalMoves.end(), std::make_pair(col, row)) != legalMoves.end();
 
                 if (isLegalMove) {
-                    std::string newPosition = std::string(1, 'a' + col) + std::to_string(8 - row);
-                    selectedPiece->setPosition(col, row);
-                    logMove(selectedPiece, selectedPieceOldPosition, newPosition);
+                    movePiece(selectedPiece, col, row);  // Handle the move with turn logic
                 }
 
                 selectedPiece = nullptr;

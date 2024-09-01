@@ -4,10 +4,11 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
-#include <algorithm> // Required for std::find_if
+#include <algorithm>
 #include "log.h"
 #include "game/pieces/piece.h"
-#include "mouse.h"  // Include the mouse.h for interaction with mouse events
+#include "game/logic/logic.h"
+#include "mouse.h" 
 
 extern Logger logger;
 
@@ -75,9 +76,9 @@ void drawChessboard(unsigned int shaderProgram, unsigned int boardTextures[2], c
 
             glUniform3f(glGetUniformLocation(shaderProgram, "offset"), x, y, 0.0f);
 
-            // Highlight legal moves only if showLegalMoves is true
+            // Highlight legal moves only if it's the player's turn
             bool isHighlighted = false;
-            if (showLegalMoves) {
+            if ((isWhiteTurn && showWhiteLegalMoves) || (!isWhiteTurn && showBlackLegalMoves)) {
                 auto it = std::find_if(legalMoves.begin(), legalMoves.end(), [&](const std::pair<int, int>& move) {
                     return move.first == j && move.second == i;
                 });

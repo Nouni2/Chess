@@ -1,4 +1,5 @@
 #include "gameplay.h"
+#include "game/logic/logic.h"
 #include "game/pieces/king.h"
 #include "game/pieces/queen.h"
 #include "game/pieces/bishop.h"
@@ -7,9 +8,9 @@
 #include "game/pieces/pawn.h"
 #include "draw.h"
 #include "log.h"
-#include "game/gameplay/gameplay_log.h"  // Include for logging positions
+#include "game/gameplay/gameplay_log.h"
 
-std::vector<Piece*> pieces;  // Define the global pieces vector
+std::vector<Piece*> pieces;
 
 extern Logger logger;
 
@@ -57,4 +58,8 @@ void drawAllPieces(unsigned int shaderProgram, const std::vector<Piece*>& pieces
     for (const auto& piece : pieces) {
         drawPiece(shaderProgram, *piece);
     }
+}
+
+void handleMove(Piece* piece, int x, int y) {
+    movePiece(piece, x, y);  // Use the movePiece function from logic.cpp
 }

@@ -1,6 +1,6 @@
 #include "config.h"
 #include "log.h"
-
+#include "sandbox.h"
 
 
 // Extern declaration of the logger
@@ -10,12 +10,16 @@ extern Logger logger;
 const char* VERTEX_SHADER_PATH = "shaders/vertex_shader.glsl";
 const char* FRAGMENT_SHADER_PATH = "shaders/fragment_shader.glsl";
 
-// Boolean to control the display of legal moves
-bool showLegalMoves = true;
+// Booleans to control the display of legal moves for each player
+bool showWhiteLegalMoves = true;
+bool showBlackLegalMoves = true;
+
+// Initialize the global sandbox mode variable
+bool sandboxMode = true;
 
 // Define the resolution and whether shadows are used
 const bool USE_SHADOW = true;  // True for shadowed pieces
-const int RESOLUTION = 512;    // Use 512px resolution; change as needed
+const int RESOLUTION = 512;    // Use 512px resolution; 
 const float PIECE_SCALING_FACTOR = 0.8f; // Adjust the scaling factor (1.0 is the standard size)
 
 // Determine the shadow folder and resolution folder
@@ -50,4 +54,7 @@ void logConfigValues() {
 
     logger.log(LogLevel::INFO, "Piece Position: (" + std::to_string(PIECE_POSITION_X) + ", " + std::to_string(PIECE_POSITION_Y) + ")");
     logger.log(LogLevel::INFO, "Chessboard Grid Size: " + std::to_string(GRID_SIZE));
+
+     // Log sandbox configuration
+    logSandboxConfig();
 }
