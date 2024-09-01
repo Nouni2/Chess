@@ -75,20 +75,22 @@ void drawChessboard(unsigned int shaderProgram, unsigned int boardTextures[2], c
 
             glUniform3f(glGetUniformLocation(shaderProgram, "offset"), x, y, 0.0f);
 
-            // Check if the square is part of the legal moves using the mirrored j
-            auto it = std::find_if(legalMoves.begin(), legalMoves.end(), [&](const std::pair<int, int>& move) {
-                return move.first == j && move.second == i;
-            });
-            bool isHighlighted = it != legalMoves.end();
-            glUniform1i(glGetUniformLocation(shaderProgram, "highlight"), isHighlighted ? 1 : 0);
+            // Highlight legal moves only if showLegalMoves is true
+            bool isHighlighted = false;
+            if (showLegalMoves) {
+                auto it = std::find_if(legalMoves.begin(), legalMoves.end(), [&](const std::pair<int, int>& move) {
+                    return move.first == j && move.second == i;
+                });
+                isHighlighted = it != legalMoves.end();
+            }
 
+            glUniform1i(glGetUniformLocation(shaderProgram, "highlight"), isHighlighted ? 1 : 0);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         }
     }
 
     glBindVertexArray(0);
 }
-
 
 void drawPiece(unsigned int shaderProgram, const Piece& piece) {
     static bool firstCall = true;

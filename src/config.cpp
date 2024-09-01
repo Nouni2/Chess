@@ -1,12 +1,17 @@
 #include "config.h"
 #include "log.h"
 
+
+
 // Extern declaration of the logger
 extern Logger logger;
 
 // Shader paths
 const char* VERTEX_SHADER_PATH = "shaders/vertex_shader.glsl";
 const char* FRAGMENT_SHADER_PATH = "shaders/fragment_shader.glsl";
+
+// Boolean to control the display of legal moves
+bool showLegalMoves = true;
 
 // Define the resolution and whether shadows are used
 const bool USE_SHADOW = true;  // True for shadowed pieces

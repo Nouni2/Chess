@@ -7,7 +7,7 @@
 extern const std::string shadowFolder;
 extern const std::string resolutionFolder;
 
-extern  const int RESOLUTION;
+extern const int RESOLUTION;
 
 // Shader paths
 extern const char* VERTEX_SHADER_PATH;
@@ -27,6 +27,9 @@ extern const int GRID_SIZE;
 
 // Scaling factor for pieces
 extern const float PIECE_SCALING_FACTOR;
+
+// Boolean to control the display of legal moves
+extern bool showLegalMoves;  
 
 // Function to log the configuration values
 void logConfigValues();

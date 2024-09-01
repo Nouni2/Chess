@@ -3,6 +3,8 @@
 #include "texture.h"
 #include "log.h"
 #include "mouse.h"
+#include "sound.h"
+
 
 
 // Initialize the static member for tracking unique IDs
@@ -40,10 +42,26 @@ void Piece::setPosition(const std::string& pos) {
 }
 
 void Piece::setPosition(int x, int y) {
+    static Sound moveSound;
+    static bool soundLoaded = false;
+
+    if (!soundLoaded) {
+        if (moveSound.load("assets/soundfx/move.wav")) {
+            logger.log(LogLevel::INFO, "Move sound loaded successfully.");
+        } else {
+            logger.log(LogLevel::ERROR, "Failed to load move sound.");
+        }
+        soundLoaded = true;
+    }
+
     position = {x, y};
     logger.log(LogLevel::INFO, "Set position for piece with UID: " + std::to_string(uid) + " to (" + 
                std::to_string(x) + ", " + std::to_string(y) + ")");
+
+    // Play the move sound
+    moveSound.play();
 }
+
 
 PieceColor Piece::getColor() const {
     return color;
