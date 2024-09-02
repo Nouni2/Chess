@@ -1,6 +1,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <chrono>  // Include chrono for timing
+#include <chrono>
 #include "config.h"
 #include "shaders.h"
 #include "texture.h"
@@ -10,12 +10,15 @@
 #include "log.h"
 #include "gameplay.h"
 #include "viewer.h"
-#include "mouse.h"  // Include mouse for callback setup
+#include "mouse.h"
+#include "memory.h"
 #include "input_handler.h"
 #include "game/gameplay/gameplay_log.h"
 
 extern Logger logger;
-extern std::vector<Piece*> pieces;  // Define the global pieces vector
+extern std::vector<Piece*> pieces;
+
+Memory gameMemory;  // Memory object to track moves
 
 int main() {
     logger.log(LogLevel::INFO, "Starting application...");

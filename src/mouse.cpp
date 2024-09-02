@@ -5,12 +5,14 @@
 #include "gameplay.h"
 #include "game/gameplay/gameplay_log.h" 
 #include "game/logic/logic.h"
+#include "memory.h"  // Include memory for storing moves
 #include <iostream>
 #include <vector>
 #include <algorithm>
 
 extern Logger logger;
 extern std::vector<Piece*> pieces;
+extern Memory gameMemory;  // Declare the global memory object
 
 Piece* selectedPiece = nullptr;
 std::string selectedPieceOldPosition;
@@ -64,7 +66,12 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
                 bool isLegalMove = std::find(legalMoves.begin(), legalMoves.end(), std::make_pair(col, row)) != legalMoves.end();
 
                 if (isLegalMove) {
-                    movePiece(selectedPiece, col, row);  // Handle the move with turn logic
+                    // Store the move in memory before moving the piece
+                    std::string finalPosition = std::string(1, 'a' + col) + std::to_string(8 - row);
+                    gameMemory.addMove(gameMemory.getMoveHistory().size() / 2 + 1, selectedPiece->getUID(), isTurnValid(PieceColor::WHITE), selectedPieceOldPosition, finalPosition);
+
+                    // Move the piece
+                    movePiece(selectedPiece, col, row);
                 }
 
                 selectedPiece = nullptr;
