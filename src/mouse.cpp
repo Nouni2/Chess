@@ -5,6 +5,7 @@
 #include "gameplay.h"
 #include "game/gameplay/gameplay_log.h" 
 #include "game/logic/logic.h"
+#include "game/pieces/pawn.h"
 #include "memory.h"  // Include memory for storing moves
 #include <iostream>
 #include <vector>
@@ -69,6 +70,13 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
                     // Store the move in memory before moving the piece
                     std::string finalPosition = std::string(1, 'a' + col) + std::to_string(8 - row);
                     gameMemory.addMove(gameMemory.getMoveHistory().size() / 2 + 1, selectedPiece->getUID(), isTurnValid(PieceColor::WHITE), selectedPieceOldPosition, finalPosition);
+
+                    // Check for en passant capture
+                    if (auto pawn = dynamic_cast<Pawn*>(selectedPiece)) {
+                        if (abs(col - (selectedPieceOldPosition[0] - 'a')) == 1 && abs(row - (8 - (selectedPieceOldPosition[1] - '0'))) == 1) {
+                            pawn->performEnPassant(col, row);
+                        }
+                    }
 
                     // Move the piece
                     movePiece(selectedPiece, col, row);

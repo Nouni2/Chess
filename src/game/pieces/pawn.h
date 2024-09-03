@@ -1,16 +1,20 @@
 #ifndef PAWN_H
 #define PAWN_H
 
-#include "piece.h"
+#include "game/pieces/piece.h"
 #include "config.h"
 #include "log.h"
-#include "gameplay.h"  // Include gameplay logging
+#include "gameplay.h"  // Include for gameplay management
 #include "game/logic/capture.h" // Include for capture logic
 #include "mouse.h" // Include for findPieceAtPosition
+#include "memory.h"  // Include for accessing the game memory
+#include "game/logic/logic.h" // Include logic for turn management
+#include "game/gameplay/gameplay_log.h" // Include for gameplay logging
 
 extern Logger logger;
 extern std::vector<Piece*> pieces;  // Extern declaration of the pieces vector
 extern Logger gameplayLogger;  // Extern declaration of the gameplay logger
+extern Memory gameMemory;  // Extern declaration of the game memory object
 
 class Pawn : public Piece {
 public:
@@ -38,21 +42,18 @@ public:
         }
 
         // Capture moves
-        bool canCaptureLeft = isCapturePossible(x - 1, y - direction);
-        bool canCaptureRight = isCapturePossible(x + 1, y - direction);
-
-        if (canCaptureLeft) {
+        if (isCapturePossible(x - 1, y - direction)) {
             moves.push_back({x - 1, y - direction});
         }
-        if (canCaptureRight) {
+        if (isCapturePossible(x + 1, y - direction)) {
             moves.push_back({x + 1, y - direction});
         }
 
         // Handle en passant
         if (isEnPassantCapture(x, y, direction)) {
-            if (findPieceAtPosition(x + 1, y - direction, pieces)) {
+            if (findPieceAtPosition(x + 1, y, pieces)) {
                 moves.push_back({x + 1, y - direction});
-            } else if (findPieceAtPosition(x - 1, y - direction, pieces)) {
+            } else if (findPieceAtPosition(x - 1, y, pieces)) {
                 moves.push_back({x - 1, y - direction});
             }
         }
@@ -62,6 +63,74 @@ public:
                    " from position (" + std::to_string(x) + ", " + std::to_string(y) + ").");
 
         return moves;
+    }
+
+    // Perform en passant capture if applicable
+    void performEnPassant(int x, int y) {
+        int direction = (getColor() == PieceColor::WHITE) ? 1 : -1;
+        Piece* targetPawn = findPieceAtPosition(x, y + direction, pieces);
+        if (targetPawn && dynamic_cast<Pawn*>(targetPawn)) {
+            targetPawn->setPosition(-1, -1);  // Remove the captured pawn from the board
+            logger.log(LogLevel::INFO, "En passant: Captured pawn with UID: " + std::to_string(targetPawn->getUID()));
+            gameplayLogger.log(LogLevel::POSITION, "En passant capture performed by pawn with UID: " + std::to_string(getUID()) +
+                               " at position (" + std::to_string(x) + ", " + std::to_string(y) + ").");
+
+            // Update the capturing pawn's position to reflect the en passant move
+            setPosition(x, y);
+
+            // Switch turn after performing en passant
+            switchTurn();  // This is a function in the game logic that switches the turn
+        }
+    }
+
+    // Make isEnPassantCapture public so it can be accessed outside the class
+    bool isEnPassantCapture(int x, int y, int direction) const {
+        if ((getColor() == PieceColor::WHITE && y == 3) || (getColor() == PieceColor::BLACK && y == 4)) {
+            Piece* leftPawn = findPieceAtPosition(x - 1, y, pieces);
+            Piece* rightPawn = findPieceAtPosition(x + 1, y, pieces);
+
+            auto lastMove = gameMemory.getLastMove();
+
+            // For White Pawns
+            if (getColor() == PieceColor::WHITE) {
+                if (leftPawn && dynamic_cast<Pawn*>(leftPawn) && leftPawn->getColor() == PieceColor::BLACK) {
+                    if (lastMove.pieceUID == leftPawn->getUID() &&
+                        lastMove.initialLocation[1] == '7' &&
+                        lastMove.finalLocation[1] == '5') {
+                        return true;
+                    }
+                }
+
+                if (rightPawn && dynamic_cast<Pawn*>(rightPawn) && rightPawn->getColor() == PieceColor::BLACK) {
+                    if (lastMove.pieceUID == rightPawn->getUID() &&
+                        lastMove.initialLocation[1] == '7' &&
+                        lastMove.finalLocation[1] == '5') {
+                        return true;
+                    }
+                }
+            }
+
+            // For Black Pawns
+            if (getColor() == PieceColor::BLACK) {
+                if (leftPawn && dynamic_cast<Pawn*>(leftPawn) && leftPawn->getColor() == PieceColor::WHITE) {
+                    if (lastMove.pieceUID == leftPawn->getUID() &&
+                        lastMove.initialLocation[1] == '2' &&
+                        lastMove.finalLocation[1] == '4') {
+                        return true;
+                    }
+                }
+
+                if (rightPawn && dynamic_cast<Pawn*>(rightPawn) && rightPawn->getColor() == PieceColor::WHITE) {
+                    if (lastMove.pieceUID == rightPawn->getUID() &&
+                        lastMove.initialLocation[1] == '2' &&
+                        lastMove.finalLocation[1] == '4') {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
 private:
@@ -76,11 +145,6 @@ private:
     bool isCapturePossible(int targetX, int targetY) const {
         Piece* targetPiece = findPieceAtPosition(targetX, targetY, pieces);
         return targetPiece && targetPiece->getColor() != getColor();
-    }
-
-    bool isEnPassantCapture(int x, int y, int direction) const {
-        // Placeholder logic, returns false to prevent issues
-        return false;
     }
 };
 
