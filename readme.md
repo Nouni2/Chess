@@ -1,4 +1,4 @@
-# OpenGL Chess Game
+# OpenGL Chess Game (Under development)
 
 This project is a chess game rendered using OpenGL, built to run on any system that supports OpenGL and C++. It features full gameplay, including legal move enforcement, check detection, and piece capturing, with graphical rendering and sound effects.
 
