@@ -16,6 +16,11 @@ add_executable(Chess ${SOURCES})
 # Include paths so headers can be found
 target_include_directories(Chess PRIVATE
     src
+    src/core
+    src/graphics
+    src/input
+    src/audio
+    src/vendor
     src/game
     src/game/pieces
     src/game/logic

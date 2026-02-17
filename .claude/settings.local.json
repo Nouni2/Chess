@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git mv:*)",
+      "Bash(cmake --build:*)",
+      "Bash(C:/msys64/ucrt64/bin/g++.exe:*)",
+      "Bash(echo:*)"
+    ]
+  }
+}
