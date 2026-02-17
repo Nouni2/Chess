@@ -12,13 +12,13 @@ extern const int RESOLUTION;
 extern bool showFPS;
 
 // Shader paths
-extern const char* VERTEX_SHADER_PATH;
-extern const char* FRAGMENT_SHADER_PATH;
+extern const std::string VERTEX_SHADER_PATH;
+extern const std::string FRAGMENT_SHADER_PATH;
 
 // Texture paths
-extern const char* LIGHT_SQUARE_TEXTURE_PATH;
-extern const char* DARK_SQUARE_TEXTURE_PATH;
-extern const char* PIECE_TEXTURE_PATH;
+extern const std::string LIGHT_SQUARE_TEXTURE_PATH;
+extern const std::string DARK_SQUARE_TEXTURE_PATH;
+extern const std::string PIECE_TEXTURE_PATH;
 
 // Piece placement
 extern const int PIECE_POSITION_X;

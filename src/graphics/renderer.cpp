@@ -42,7 +42,7 @@ void resizeRenderer(unsigned int shaderProgram, int windowWidth, int windowHeigh
     // Calculate the scaling factor to ensure the chessboard fits the window
     float scaleX = static_cast<float>(windowWidth) / GRID_SIZE;
     float scaleY = static_cast<float>(windowHeight) / GRID_SIZE;
-    float scale = param_1 * std::min(scaleX, scaleY);  // Maintain aspect ratio by using the smaller scale factor
+    float scale = boardScale * std::min(scaleX, scaleY);  // Maintain aspect ratio by using the smaller scale factor
 
     // Apply the scaling matrix
     glm::mat4 scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scale, scale, 1.0f));
@@ -56,7 +56,7 @@ void resizeRenderer(unsigned int shaderProgram, int windowWidth, int windowHeigh
     translateY = translateY / (windowHeight / 2.0f);
 
     // Apply the translation matrix to center the chessboard
-    glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-translateX / param_2, -translateY / param_3, 0.0f));
+    glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-translateX / translateCorrectionX, -translateY / translateCorrectionY, 0.0f));
 
     // Combine the translation, scaling, and projection matrices
     projection = translationMatrix * scalingMatrix * projection;

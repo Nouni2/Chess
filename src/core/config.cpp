@@ -7,8 +7,8 @@
 extern Logger logger;
 
 // Shader paths
-const char* VERTEX_SHADER_PATH = "shaders/vertex_shader.glsl";
-const char* FRAGMENT_SHADER_PATH = "shaders/fragment_shader.glsl";
+const std::string VERTEX_SHADER_PATH = "shaders/vertex_shader.glsl";
+const std::string FRAGMENT_SHADER_PATH = "shaders/fragment_shader.glsl";
 
 // Booleans to control the display of legal moves for each player
 bool showWhiteLegalMoves = true;
@@ -29,14 +29,9 @@ const std::string shadowFolder = USE_SHADOW ? "With Shadow" : "No Shadow";
 const std::string resolutionFolder = std::to_string(RESOLUTION) + "px";
 
 // Construct full paths for textures
-const std::string lightSquareTexture = "assets/" + shadowFolder + "/" + resolutionFolder + "/square_gray_light.png";
-const std::string darkSquareTexture = "assets/" + shadowFolder + "/" + resolutionFolder + "/square_gray_dark.png";
-const std::string pieceTexture = "assets/" + shadowFolder + "/" + resolutionFolder + "/w_queen.png";
-
-// Convert these paths to const char*
-const char* LIGHT_SQUARE_TEXTURE_PATH = lightSquareTexture.c_str();
-const char* DARK_SQUARE_TEXTURE_PATH = darkSquareTexture.c_str();
-const char* PIECE_TEXTURE_PATH = pieceTexture.c_str();
+const std::string LIGHT_SQUARE_TEXTURE_PATH = "assets/" + shadowFolder + "/" + resolutionFolder + "/square_gray_light.png";
+const std::string DARK_SQUARE_TEXTURE_PATH = "assets/" + shadowFolder + "/" + resolutionFolder + "/square_gray_dark.png";
+const std::string PIECE_TEXTURE_PATH = "assets/" + shadowFolder + "/" + resolutionFolder + "/w_queen.png";
 
 // Piece placement
 const int PIECE_POSITION_X = 4; // Column e (0-based index)
@@ -50,9 +45,9 @@ void logConfigValues() {
     logger.log(LogLevel::DEBUG, "RESOLUTION: " + std::to_string(RESOLUTION));
     logger.log(LogLevel::DEBUG, "PIECE_SCALING_FACTOR: " + std::to_string(PIECE_SCALING_FACTOR));
 
-    logger.log(LogLevel::INFO, "Light Square Texture Path: " + lightSquareTexture);
-    logger.log(LogLevel::INFO, "Dark Square Texture Path: " + darkSquareTexture);
-    logger.log(LogLevel::INFO, "Piece Texture Path: " + pieceTexture);
+    logger.log(LogLevel::INFO, "Light Square Texture Path: " + LIGHT_SQUARE_TEXTURE_PATH);
+    logger.log(LogLevel::INFO, "Dark Square Texture Path: " + DARK_SQUARE_TEXTURE_PATH);
+    logger.log(LogLevel::INFO, "Piece Texture Path: " + PIECE_TEXTURE_PATH);
 
     logger.log(LogLevel::INFO, "Piece Position: (" + std::to_string(PIECE_POSITION_X) + ", " + std::to_string(PIECE_POSITION_Y) + ")");
     logger.log(LogLevel::INFO, "Chessboard Grid Size: " + std::to_string(GRID_SIZE));

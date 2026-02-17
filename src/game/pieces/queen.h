@@ -2,16 +2,17 @@
 #define QUEEN_H
 
 #include "piece.h"
+#include "game/game_state.h"
 #include "config.h"
 #include "log.h"
 
 extern Logger logger;
-extern std::vector<Piece*> pieces;  // Extern declaration of the pieces vector
+extern GameState gameState;
 
 class Queen : public Piece {
 public:
     Queen(PieceColor color)
-        : Piece(color, generateTexturePath(color), 9) { // The queen is worth 9 points
+        : Piece(color, PieceType::QUEEN, generateTexturePath(color), 9) { // The queen is worth 9 points
         logger.log(LogLevel::INFO, "Queen created with UID: " + std::to_string(getUID()) +
                    ", Color: " + (color == PieceColor::WHITE ? "White" : "Black") +
                    ", Score: " + std::to_string(getScore()));
@@ -21,14 +22,14 @@ public:
         std::vector<std::pair<int, int>> moves;
 
         for (int i = 1; i < GRID_SIZE; ++i) {
-            if (isMovementLegal(x + i, y, pieces)) moves.push_back({x + i, y});
-            if (isMovementLegal(x - i, y, pieces)) moves.push_back({x - i, y});
-            if (isMovementLegal(x, y + i, pieces)) moves.push_back({x, y + i});
-            if (isMovementLegal(x, y - i, pieces)) moves.push_back({x, y - i});
-            if (isMovementLegal(x + i, y + i, pieces)) moves.push_back({x + i, y + i});
-            if (isMovementLegal(x - i, y - i, pieces)) moves.push_back({x - i, y - i});
-            if (isMovementLegal(x + i, y - i, pieces)) moves.push_back({x + i, y - i});
-            if (isMovementLegal(x - i, y + i, pieces)) moves.push_back({x - i, y + i});
+            if (isMovementLegal(x + i, y, gameState.pieces)) moves.push_back({x + i, y});
+            if (isMovementLegal(x - i, y, gameState.pieces)) moves.push_back({x - i, y});
+            if (isMovementLegal(x, y + i, gameState.pieces)) moves.push_back({x, y + i});
+            if (isMovementLegal(x, y - i, gameState.pieces)) moves.push_back({x, y - i});
+            if (isMovementLegal(x + i, y + i, gameState.pieces)) moves.push_back({x + i, y + i});
+            if (isMovementLegal(x - i, y - i, gameState.pieces)) moves.push_back({x - i, y - i});
+            if (isMovementLegal(x + i, y - i, gameState.pieces)) moves.push_back({x + i, y - i});
+            if (isMovementLegal(x - i, y + i, gameState.pieces)) moves.push_back({x - i, y + i});
         }
 
         logger.log(LogLevel::DEBUG, "Calculated legal moves for Queen with UID: " + std::to_string(getUID()) +

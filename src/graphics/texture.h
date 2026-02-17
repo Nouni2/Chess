@@ -1,6 +1,8 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-unsigned int loadTexture(const char* path);
+#include <string>
+
+unsigned int loadTexture(const std::string& path);
 
 #endif // TEXTURE_H

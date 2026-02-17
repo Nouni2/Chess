@@ -2,16 +2,17 @@
 #define KNIGHT_H
 
 #include "piece.h"
+#include "game/game_state.h"
 #include "config.h"
 #include "log.h"
 
 extern Logger logger;
-extern std::vector<Piece*> pieces;  // Extern declaration of the pieces vector
+extern GameState gameState;
 
 class Knight : public Piece {
 public:
     Knight(PieceColor color)
-        : Piece(color, generateTexturePath(color), 3) {  // The Knight is worth 3 points
+        : Piece(color, PieceType::KNIGHT, generateTexturePath(color), 3) {  // The Knight is worth 3 points
         logger.log(LogLevel::INFO, "Knight created with UID: " + std::to_string(getUID()) +
                    ", Color: " + (color == PieceColor::WHITE ? "White" : "Black"));
     }
@@ -27,7 +28,7 @@ public:
         // Filter out illegal moves
         moves.erase(std::remove_if(moves.begin(), moves.end(),
             [&](const std::pair<int, int>& move) {
-                return !isMovementLegal(move.first, move.second, pieces);
+                return !isMovementLegal(move.first, move.second, gameState.pieces);
             }), moves.end());
 
         logger.log(LogLevel::DEBUG, "Calculated legal moves for Knight with UID: " + std::to_string(getUID()) +

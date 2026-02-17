@@ -2,8 +2,8 @@
 #include "log.h"
 #include "config.h"
 #include "game/pieces/piece.h"
-#include "gameplay.h"
-#include "game/gameplay/gameplay_log.h" 
+#include "game/game_state.h"
+#include "game/gameplay/gameplay_log.h"
 #include "game/logic/logic.h"
 #include "game/pieces/pawn.h"
 #include "memory.h"  // Include memory for storing moves
@@ -12,19 +12,15 @@
 #include <algorithm>
 
 extern Logger logger;
-extern std::vector<Piece*> pieces;
-extern Memory gameMemory;  // Declare the global memory object
-
-Piece* selectedPiece = nullptr;
-std::string selectedPieceOldPosition;
-std::vector<std::pair<int, int>> legalMoves;
+extern GameState gameState;
+extern Memory gameMemory;
 
 // Function to find a piece at a given position
-Piece* findPieceAtPosition(int col, int row, const std::vector<Piece*>& pieces) {
+Piece* findPieceAtPosition(int col, int row, const std::vector<std::unique_ptr<Piece>>& pieces) {
     for (auto& piece : pieces) {
         auto [pieceCol, pieceRow] = piece->getPosition();
         if (pieceCol == col && pieceRow == row) {
-            return piece;
+            return piece.get();
         }
     }
     return nullptr;
@@ -49,42 +45,42 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
             int col = static_cast<int>((xpos - marginX) / squareSize);
             int row = static_cast<int>((ypos - marginY) / squareSize);
 
-            if (selectedPiece == nullptr) {
-                selectedPiece = findPieceAtPosition(col, row, pieces);
-                if (selectedPiece && isTurnValid(selectedPiece->getColor())) {
-                    selectedPieceOldPosition = std::string(1, 'a' + col) + std::to_string(8 - row);
-                    legalMoves = selectedPiece->getLegalMoves(col, row);
+            if (gameState.selectedPiece == nullptr) {
+                gameState.selectedPiece = findPieceAtPosition(col, row, gameState.pieces);
+                if (gameState.selectedPiece && isTurnValid(gameState.selectedPiece->getColor())) {
+                    gameState.selectedPieceOldPosition = std::string(1, 'a' + col) + std::to_string(8 - row);
+                    gameState.legalMoves = gameState.selectedPiece->getLegalMoves(col, row);
 
                     // Log selected piece info
-                    std::string pieceColor = (selectedPiece->getColor() == PieceColor::WHITE) ? "White" : "Black";
-                    logger.log(LogLevel::DEBUG, "Selected " + pieceColor + " " + getPieceTypeName(selectedPiece) + " with UID: " + std::to_string(selectedPiece->getUID()) +
-                               " at position: " + selectedPieceOldPosition);
-                    gameplayLogger.log(LogLevel::POSITION, "Selected " + pieceColor + " " + getPieceTypeName(selectedPiece) + " with UID: " + std::to_string(selectedPiece->getUID()) +
-                                       " at position: " + selectedPieceOldPosition);
+                    std::string pieceColor = (gameState.selectedPiece->getColor() == PieceColor::WHITE) ? "White" : "Black";
+                    logger.log(LogLevel::DEBUG, "Selected " + pieceColor + " " + getPieceTypeName(gameState.selectedPiece) + " with UID: " + std::to_string(gameState.selectedPiece->getUID()) +
+                               " at position: " + gameState.selectedPieceOldPosition);
+                    gameplayLogger.log(LogLevel::POSITION, "Selected " + pieceColor + " " + getPieceTypeName(gameState.selectedPiece) + " with UID: " + std::to_string(gameState.selectedPiece->getUID()) +
+                                       " at position: " + gameState.selectedPieceOldPosition);
                 }
             } else {
                 // Check if the selected move is legal
-                bool isLegalMove = std::find(legalMoves.begin(), legalMoves.end(), std::make_pair(col, row)) != legalMoves.end();
+                bool isLegalMove = std::find(gameState.legalMoves.begin(), gameState.legalMoves.end(), std::make_pair(col, row)) != gameState.legalMoves.end();
 
                 if (isLegalMove) {
                     // Store the move in memory before moving the piece
                     std::string finalPosition = std::string(1, 'a' + col) + std::to_string(8 - row);
-                    gameMemory.addMove(gameMemory.getMoveHistory().size() / 2 + 1, selectedPiece->getUID(), isTurnValid(PieceColor::WHITE), selectedPieceOldPosition, finalPosition);
+                    gameMemory.addMove(gameMemory.getMoveHistory().size() / 2 + 1, gameState.selectedPiece->getUID(), isTurnValid(PieceColor::WHITE), gameState.selectedPieceOldPosition, finalPosition);
 
                     // Check for en passant capture
-                    if (auto pawn = dynamic_cast<Pawn*>(selectedPiece)) {
-                        if (abs(col - (selectedPieceOldPosition[0] - 'a')) == 1 && abs(row - (8 - (selectedPieceOldPosition[1] - '0'))) == 1) {
-                            pawn->performEnPassant(col, row);
+                    if (gameState.selectedPiece->getType() == PieceType::PAWN) {
+                        if (abs(col - (gameState.selectedPieceOldPosition[0] - 'a')) == 1 && abs(row - (8 - (gameState.selectedPieceOldPosition[1] - '0'))) == 1) {
+                            static_cast<Pawn*>(gameState.selectedPiece)->performEnPassant(col, row);
                         }
                     }
 
                     // Move the piece
-                    movePiece(selectedPiece, col, row);
+                    movePiece(gameState.selectedPiece, col, row);
                 }
 
-                selectedPiece = nullptr;
-                selectedPieceOldPosition.clear();
-                legalMoves.clear();
+                gameState.selectedPiece = nullptr;
+                gameState.selectedPieceOldPosition.clear();
+                gameState.legalMoves.clear();
             }
         }
     }

@@ -2,17 +2,18 @@
 #define BISHOP_H
 
 #include "piece.h"
+#include "game/game_state.h"
 #include "config.h"
 #include "log.h"
 #include <vector>
 
 extern Logger logger;
-extern std::vector<Piece*> pieces;  // Extern declaration of the pieces vector
+extern GameState gameState;
 
 class Bishop : public Piece {
 public:
     Bishop(PieceColor color)
-        : Piece(color, generateTexturePath(color), 3) { // The Bishop is worth 3 points
+        : Piece(color, PieceType::BISHOP, generateTexturePath(color), 3) { // The Bishop is worth 3 points
         logger.log(LogLevel::INFO, "Bishop created with UID: " + std::to_string(getUID()) +
                    ", Color: " + (color == PieceColor::WHITE ? "White" : "Black"));
     }
@@ -21,10 +22,10 @@ public:
         std::vector<std::pair<int, int>> moves;
 
         for (int i = 1; i < GRID_SIZE; ++i) {
-            if (isMovementLegal(x + i, y + i, pieces)) moves.push_back({x + i, y + i});
-            if (isMovementLegal(x - i, y - i, pieces)) moves.push_back({x - i, y - i});
-            if (isMovementLegal(x + i, y - i, pieces)) moves.push_back({x + i, y - i});
-            if (isMovementLegal(x - i, y + i, pieces)) moves.push_back({x - i, y + i});
+            if (isMovementLegal(x + i, y + i, gameState.pieces)) moves.push_back({x + i, y + i});
+            if (isMovementLegal(x - i, y - i, gameState.pieces)) moves.push_back({x - i, y - i});
+            if (isMovementLegal(x + i, y - i, gameState.pieces)) moves.push_back({x + i, y - i});
+            if (isMovementLegal(x - i, y + i, gameState.pieces)) moves.push_back({x - i, y + i});
         }
 
         logger.log(LogLevel::DEBUG, "Calculated legal moves for Bishop with UID: " + std::to_string(getUID()) +

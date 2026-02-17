@@ -7,9 +7,9 @@
 extern Logger logger;  // Use the global logger
 
 // Initialize the parameters
-float param_1 = 0.08f; // Scaling factor
-float param_2 = 7.4f;    // X translation correction factor
-float param_3 = 7.2f;    // Y translation correction factor
+float boardScale = 0.08f; // Scaling factor
+float translateCorrectionX = 7.4f;    // X translation correction factor
+float translateCorrectionY = 7.2f;    // Y translation correction factor
 bool enableInput = false; // Boolean to enable/disable input handling
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -22,41 +22,41 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
         switch (key) {
             case GLFW_KEY_MINUS:
-                param_1 -= 0.0001f;
-                logger.log(LogLevel::DEBUG, "Decreased param_1 (Scaling Factor) to " + std::to_string(param_1));
+                boardScale -= 0.0001f;
+                logger.log(LogLevel::DEBUG, "Decreased boardScale (Scaling Factor) to " + std::to_string(boardScale));
                 break;
             case GLFW_KEY_EQUAL:
-                param_1 += 0.0001f;
-                logger.log(LogLevel::DEBUG, "Increased param_1 (Scaling Factor) to " + std::to_string(param_1));
+                boardScale += 0.0001f;
+                logger.log(LogLevel::DEBUG, "Increased boardScale (Scaling Factor) to " + std::to_string(boardScale));
                 break;
             case GLFW_KEY_UP:
-                param_3 += 0.1f;
-                logger.log(LogLevel::DEBUG, "Increased param_3 (Y Translation Correction) to " + std::to_string(param_3));
+                translateCorrectionY += 0.1f;
+                logger.log(LogLevel::DEBUG, "Increased translateCorrectionY (Y Translation Correction) to " + std::to_string(translateCorrectionY));
                 break;
             case GLFW_KEY_DOWN:
-                param_3 -= 0.1f;
-                logger.log(LogLevel::DEBUG, "Decreased param_3 (Y Translation Correction) to " + std::to_string(param_3));
+                translateCorrectionY -= 0.1f;
+                logger.log(LogLevel::DEBUG, "Decreased translateCorrectionY (Y Translation Correction) to " + std::to_string(translateCorrectionY));
                 break;
             case GLFW_KEY_LEFT:
-                param_2 -= 0.1f;
-                logger.log(LogLevel::DEBUG, "Decreased param_2 (X Translation Correction) to " + std::to_string(param_2));
+                translateCorrectionX -= 0.1f;
+                logger.log(LogLevel::DEBUG, "Decreased translateCorrectionX (X Translation Correction) to " + std::to_string(translateCorrectionX));
                 break;
             case GLFW_KEY_RIGHT:
-                param_2 += 0.1f;
-                logger.log(LogLevel::DEBUG, "Increased param_2 (X Translation Correction) to " + std::to_string(param_2));
+                translateCorrectionX += 0.1f;
+                logger.log(LogLevel::DEBUG, "Increased translateCorrectionX (X Translation Correction) to " + std::to_string(translateCorrectionX));
                 break;
             case GLFW_KEY_ENTER:
                 // Log the current parameter values to the log file
                 logger.log(LogLevel::INFO, "Current parameter values:");
-                logger.log(LogLevel::INFO, "param_1 (Scaling Factor): " + std::to_string(param_1));
-                logger.log(LogLevel::INFO, "param_2 (X Translation Correction): " + std::to_string(param_2));
-                logger.log(LogLevel::INFO, "param_3 (Y Translation Correction): " + std::to_string(param_3));
+                logger.log(LogLevel::INFO, "boardScale (Scaling Factor): " + std::to_string(boardScale));
+                logger.log(LogLevel::INFO, "translateCorrectionX (X Translation Correction): " + std::to_string(translateCorrectionX));
+                logger.log(LogLevel::INFO, "translateCorrectionY (Y Translation Correction): " + std::to_string(translateCorrectionY));
 
                 // Print the current parameter values to the console
                 std::cout << "Current parameter values:\n";
-                std::cout << "param_1 (Scaling Factor): " << param_1 << "\n";
-                std::cout << "param_2 (X Translation Correction): " << param_2 << "\n";
-                std::cout << "param_3 (Y Translation Correction): " << param_3 << "\n";
+                std::cout << "boardScale (Scaling Factor): " << boardScale << "\n";
+                std::cout << "translateCorrectionX (X Translation Correction): " << translateCorrectionX << "\n";
+                std::cout << "translateCorrectionY (Y Translation Correction): " << translateCorrectionY << "\n";
                 logger.log(LogLevel::INFO, "Current parameter values printed to console.");
                 break;
             default:

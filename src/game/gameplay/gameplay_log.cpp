@@ -3,12 +3,6 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include "game/pieces/king.h"
-#include "game/pieces/queen.h"
-#include "game/pieces/bishop.h"
-#include "game/pieces/knight.h"
-#include "game/pieces/rook.h"
-#include "game/pieces/pawn.h"
 
 // Define the gameplay logger instance
 Logger gameplayLogger("logs/gameplay.log");
@@ -31,12 +25,14 @@ void initializeLogs() {
 
 // Function to get a piece type as a string
 std::string getPieceTypeName(const Piece* piece) {
-    if (dynamic_cast<const King*>(piece)) return "King";
-    if (dynamic_cast<const Queen*>(piece)) return "Queen";
-    if (dynamic_cast<const Bishop*>(piece)) return "Bishop";
-    if (dynamic_cast<const Knight*>(piece)) return "Knight";
-    if (dynamic_cast<const Rook*>(piece)) return "Rook";
-    if (dynamic_cast<const Pawn*>(piece)) return "Pawn";
+    switch (piece->getType()) {
+        case PieceType::KING:   return "King";
+        case PieceType::QUEEN:  return "Queen";
+        case PieceType::BISHOP: return "Bishop";
+        case PieceType::KNIGHT: return "Knight";
+        case PieceType::ROOK:   return "Rook";
+        case PieceType::PAWN:   return "Pawn";
+    }
     return "UnknownPiece";
 }
 
@@ -61,7 +57,7 @@ void logMove(const Piece* piece, const std::string& oldPosition, const std::stri
 }
 
 // Function to log the initial positions of all pieces after setup
-void logPiecePositions(const std::vector<Piece*>& pieces) {
+void logPiecePositions(const std::vector<std::unique_ptr<Piece>>& pieces) {
     for (const auto& piece : pieces) {
         auto [col, row] = piece->getPosition();
         if (col != -1 && row != -1) { // Valid position
@@ -70,7 +66,7 @@ void logPiecePositions(const std::vector<Piece*>& pieces) {
             std::string position = std::string(1, colChar) + std::to_string(rowNumber);
 
             // Log the creation and initial position of each piece
-            logPieceCreation(piece, position);
+            logPieceCreation(piece.get(), position);
         }
     }
     gameplayLogger.log(LogLevel::INFO, "Initial piece positions logged.");

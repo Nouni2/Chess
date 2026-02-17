@@ -7,8 +7,14 @@ chess_board
 *.log
 *.tmp
 
-# Ignore VS Code settings folder
+# Ignore VS Code settings
 .vscode/
+
+# Ignore Claude Code local settings
+.claude/
+
+# Ignore benchmarks (local data)
+benchmarks/
 
 # Ignore MacOS system files
 .DS_Store

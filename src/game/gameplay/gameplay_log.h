@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include "game/pieces/piece.h"
 #include "log.h"  // Include the log header to use the Logger class
 
@@ -13,7 +14,7 @@ extern Logger gameplayLogger;
 void initializeLogs();
 
 // Log the positions of all pieces
-void logPiecePositions(const std::vector<Piece*>& pieces);
+void logPiecePositions(const std::vector<std::unique_ptr<Piece>>& pieces);
 
 // Log a piece creation with its initial position
 void logPieceCreation(const Piece* piece, const std::string& position);

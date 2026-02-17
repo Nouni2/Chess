@@ -7,14 +7,14 @@
 
 extern Logger logger;  // Use the global logger
 
-unsigned int loadTexture(const char* path) {
-    logger.log(LogLevel::INFO, "Loading texture from path: " + std::string(path));
+unsigned int loadTexture(const std::string& path) {
+    logger.log(LogLevel::INFO, "Loading texture from path: " + path);
 
     unsigned int textureID;
     glGenTextures(1, &textureID);
 
     int width, height, nrComponents;
-    unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
+    unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
     if (data) {
         GLenum format;
         if (nrComponents == 1)
@@ -36,7 +36,7 @@ unsigned int loadTexture(const char* path) {
         stbi_image_free(data);
         logger.log(LogLevel::INFO, "Texture loaded successfully: ID " + std::to_string(textureID));
     } else {
-        logger.log(LogLevel::ERROR, "Failed to load texture: " + std::string(path));
+        logger.log(LogLevel::ERROR, "Failed to load texture: " + path);
         stbi_image_free(data);
     }
 

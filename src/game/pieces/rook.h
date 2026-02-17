@@ -2,16 +2,17 @@
 #define ROOK_H
 
 #include "piece.h"
+#include "game/game_state.h"
 #include "config.h"
 #include "log.h"
 
 extern Logger logger;
-extern std::vector<Piece*> pieces;  // Extern declaration of the pieces vector
+extern GameState gameState;
 
 class Rook : public Piece {
 public:
     Rook(PieceColor color)
-        : Piece(color, generateTexturePath(color), 5) {  // The Rook is worth 5 points
+        : Piece(color, PieceType::ROOK, generateTexturePath(color), 5) {  // The Rook is worth 5 points
         logger.log(LogLevel::INFO, "Rook created with UID: " + std::to_string(getUID()) +
                    ", Color: " + (color == PieceColor::WHITE ? "White" : "Black"));
     }
@@ -20,10 +21,10 @@ public:
         std::vector<std::pair<int, int>> moves;
 
         for (int i = 1; i < GRID_SIZE; ++i) {
-            if (isMovementLegal(x + i, y, pieces)) moves.push_back({x + i, y});
-            if (isMovementLegal(x - i, y, pieces)) moves.push_back({x - i, y});
-            if (isMovementLegal(x, y + i, pieces)) moves.push_back({x, y + i});
-            if (isMovementLegal(x, y - i, pieces)) moves.push_back({x, y - i});
+            if (isMovementLegal(x + i, y, gameState.pieces)) moves.push_back({x + i, y});
+            if (isMovementLegal(x - i, y, gameState.pieces)) moves.push_back({x - i, y});
+            if (isMovementLegal(x, y + i, gameState.pieces)) moves.push_back({x, y + i});
+            if (isMovementLegal(x, y - i, gameState.pieces)) moves.push_back({x, y - i});
         }
 
         logger.log(LogLevel::DEBUG, "Calculated legal moves for Rook with UID: " + std::to_string(getUID()) +

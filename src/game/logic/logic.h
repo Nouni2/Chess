@@ -4,9 +4,6 @@
 #include "game/pieces/piece.h"
 #include <vector>
 
-// Boolean to track the current turn: true for White, false for Black
-extern bool isWhiteTurn;
-
 // Function to switch turns
 void switchTurn();
 

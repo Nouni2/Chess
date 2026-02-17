@@ -14,11 +14,13 @@
 #include "memory.h"
 #include "input_handler.h"
 #include "game/gameplay/gameplay_log.h"
+#include "game/game_state.h"
+#include "benchmark.h"
 
 extern Logger logger;
-extern std::vector<Piece*> pieces;
 
-Memory gameMemory;  // Memory object to track moves
+GameState gameState;      // Central game state (owns all pieces)
+Memory gameMemory;        // Memory object to track moves
 
 int main() {
     logger.log(LogLevel::INFO, "Starting application...");
@@ -88,45 +90,46 @@ int main() {
     gameplayLogger.log(LogLevel::INFO, "Board textures loaded successfully.");
 
     // Setup the pieces
-    setupPieces(pieces);
-    logPiecePositions(pieces);  // Log the initial positions of the pieces
+    setupPieces(gameState.pieces);
+    logPiecePositions(gameState.pieces);
     gameplayLogger.log(LogLevel::INFO, "Pieces setup completed.");
 
     logger.log(LogLevel::DEBUG, "Entering rendering loop...");
     gameplayLogger.log(LogLevel::DEBUG, "Entering rendering loop...");
 
+    // ── BENCHMARK MODE (uncomment to run benchmark) ─────────────────────────
+    // runBenchmark(window, shaderProgram, boardTextures, gameState.pieces, gameState.legalMoves);
+    // ── Normal game loop ──────────────────────────────────────────────────────
     auto startTime = std::chrono::high_resolution_clock::now();
     int frameCount = 0;
-
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        drawChessboard(shaderProgram, boardTextures, legalMoves); // Draw the chessboard with possible moves highlighted
-        drawAllPieces(shaderProgram, pieces);  // Draw all the pieces
-
+        drawChessboard(shaderProgram, boardTextures, gameState.legalMoves);
+        drawAllPieces(shaderProgram, gameState.pieces);
         glfwPollEvents();
         updateWindow(window);
-
-        // FPS calculation and display
         if (showFPS) {
             frameCount++;
             auto currentTime = std::chrono::high_resolution_clock::now();
             std::chrono::duration<float> duration = currentTime - startTime;
-
             if (duration.count() >= 1.0f) {
                 float fps = frameCount / duration.count();
-                std::string windowTitle = "Chessboard - FPS: " + std::to_string(fps);
-                glfwSetWindowTitle(window, windowTitle.c_str());
+                glfwSetWindowTitle(window, ("Chessboard - FPS: " + std::to_string(fps)).c_str());
                 frameCount = 0;
                 startTime = currentTime;
             }
         }
     }
 
-    // Cleanup dynamically allocated pieces
-    for (Piece* piece : pieces) {
-        delete piece;
+    // Cleanup OpenGL resources
+    for (const auto& piece : gameState.pieces) {
+        unsigned int tex = piece->getTexture();
+        glDeleteTextures(1, &tex);
     }
+    glDeleteTextures(2, boardTextures);
+    glDeleteProgram(shaderProgram);
+
+    // unique_ptr pieces are automatically freed when gameState goes out of scope
 
     logger.log(LogLevel::INFO, "Terminating application...");
     gameplayLogger.log(LogLevel::INFO, "Terminating application...");

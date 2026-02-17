@@ -2,18 +2,19 @@
 #define KING_H
 
 #include "piece.h"
+#include "game/game_state.h"
 #include "config.h"
 #include "log.h"
 #include <limits>
 #include <algorithm>
 
 extern Logger logger;
-extern std::vector<Piece*> pieces;  // Extern declaration of the pieces vector
+extern GameState gameState;
 
 class King : public Piece {
 public:
     King(PieceColor color)
-        : Piece(color, generateTexturePath(color), std::numeric_limits<int>::max()) { // The King is invaluable
+        : Piece(color, PieceType::KING, generateTexturePath(color), std::numeric_limits<int>::max()) { // The King is invaluable
         logger.log(LogLevel::INFO, "King created with UID: " + std::to_string(getUID()) +
                    ", Color: " + (color == PieceColor::WHITE ? "White" : "Black"));
     }
@@ -27,7 +28,7 @@ public:
         // Filter out illegal moves
         moves.erase(std::remove_if(moves.begin(), moves.end(),
             [&](const std::pair<int, int>& move) {
-                return !isMovementLegal(move.first, move.second, pieces);
+                return !isMovementLegal(move.first, move.second, gameState.pieces);
             }), moves.end());
 
         logger.log(LogLevel::DEBUG, "Calculated legal moves for King with UID: " + std::to_string(getUID()) +

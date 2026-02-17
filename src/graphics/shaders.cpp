@@ -7,10 +7,10 @@
 
 extern Logger logger;  // Use the global logger
 
-unsigned int loadShaders(const char* vertexPath, const char* fragmentPath) {
+unsigned int loadShaders(const std::string& vertexPath, const std::string& fragmentPath) {
     logger.log(LogLevel::INFO, "Loading shaders.");
-    logger.log(LogLevel::DEBUG, "Vertex shader path: " + std::string(vertexPath));
-    logger.log(LogLevel::DEBUG, "Fragment shader path: " + std::string(fragmentPath));
+    logger.log(LogLevel::DEBUG, "Vertex shader path: " + vertexPath);
+    logger.log(LogLevel::DEBUG, "Fragment shader path: " + fragmentPath);
 
     std::string vertexCode;
     std::string fragmentCode;

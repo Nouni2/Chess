@@ -1,41 +1,55 @@
 #include "capture.h"
-#include "game/pieces/piece.h"
+#include "game/game_state.h"
 #include "config.h"
 #include "log.h"
-#include "gameplay.h"  // Include gameplay logging
+#include "sound.h"
+#include "game/gameplay/gameplay_log.h"
 
 extern Logger logger;
 extern Logger gameplayLogger;
+extern GameState gameState;
 
-void capturePiece(Piece* movingPiece, int targetX, int targetY, std::vector<Piece*>& pieces) {
-    // Find the enemy piece at the target position
-    Piece* targetPiece = nullptr;
-    for (auto& piece : pieces) {
-        if (piece->getPosition().first == targetX && piece->getPosition().second == targetY) {
-            targetPiece = piece;
-            break;
-        }
-    }
-
-    // Assume that targetPiece is a valid enemy piece because this function should only be called when a capture is legal
+void capturePiece(Piece* movingPiece, Piece* targetPiece) {
     if (targetPiece && targetPiece->getColor() != movingPiece->getColor()) {
+        auto targetPos = targetPiece->getPosition();
         logger.log(LogLevel::INFO, "Capturing enemy piece with UID: " + std::to_string(targetPiece->getUID()));
-        gameplayLogger.log(LogLevel::POSITION, "Piece with UID " + std::to_string(movingPiece->getUID()) + 
-                           " (" + (movingPiece->getColor() == PieceColor::WHITE ? "White" : "Black") + 
-                           ") captured piece with UID " + std::to_string(targetPiece->getUID()) + 
-                           " (" + (targetPiece->getColor() == PieceColor::WHITE ? "White" : "Black") + 
-                           ") at position (" + std::to_string(targetX) + ", " + std::to_string(targetY) + ").");
+        gameplayLogger.log(LogLevel::POSITION, "Piece with UID " + std::to_string(movingPiece->getUID()) +
+                           " (" + (movingPiece->getColor() == PieceColor::WHITE ? "White" : "Black") +
+                           ") captured piece with UID " + std::to_string(targetPiece->getUID()) +
+                           " (" + (targetPiece->getColor() == PieceColor::WHITE ? "White" : "Black") +
+                           ") at position (" + std::to_string(targetPos.first) + ", " + std::to_string(targetPos.second) + ").");
 
-        // Perform the capture by moving the capturing piece to the captured piece's position
-        targetPiece->destroyPiece(pieces);  // Remove the captured piece from the board
-        movingPiece->setPosition(targetX, targetY);  // Move the capturing piece to the captured position
+        // Move the captured piece off the board
+        targetPiece->setPosition(-1, -1);
 
-        // Log the successful capture and movement
+        // Add to appropriate captured list in GameState
+        if (targetPiece->getColor() == PieceColor::WHITE) {
+            gameState.capturedWhite.push_back(targetPiece);
+            logger.log(LogLevel::INFO, "White piece captured and added to Black's collection.");
+        } else {
+            gameState.capturedBlack.push_back(targetPiece);
+            logger.log(LogLevel::INFO, "Black piece captured and added to White's collection.");
+        }
+
+        // Move the capturing piece to the captured position
+        movingPiece->setPosition(targetPos.first, targetPos.second);
+
+        // Play capture sound
+        static Sound captureSound;
+        static bool captureSoundLoaded = false;
+        if (!captureSoundLoaded) {
+            if (captureSound.load("assets/soundfx/capture.wav")) {
+                logger.log(LogLevel::INFO, "Capture sound loaded successfully.");
+            } else {
+                logger.log(LogLevel::ERROR, "Failed to load capture sound.");
+            }
+            captureSoundLoaded = true;
+        }
+        captureSound.play();
+
         logger.log(LogLevel::INFO, "Moved piece with UID: " + std::to_string(movingPiece->getUID()) +
-                                   " to position (" + std::to_string(targetX) + ", " + std::to_string(targetY) + ").");
+                                   " to position (" + std::to_string(targetPos.first) + ", " + std::to_string(targetPos.second) + ").");
     } else {
-        // This should not happen if the function is called correctly
-        logger.log(LogLevel::ERROR, "Capture failed: No valid enemy piece to capture at position (" + 
-                                    std::to_string(targetX) + ", " + std::to_string(targetY) + ").");
+        logger.log(LogLevel::ERROR, "Capture failed: No valid enemy piece to capture.");
     }
 }

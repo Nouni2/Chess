@@ -1,26 +1,24 @@
 #include "memory.h"
 #include "log.h"
 #include "game/gameplay/gameplay_log.h"
+#include "game/game_state.h"
 #include <fstream>
-#include <typeinfo>
-#include "game/pieces/king.h"
-#include "game/pieces/queen.h"
-#include "game/pieces/bishop.h"
-#include "game/pieces/knight.h"
-#include "game/pieces/rook.h"
-#include "game/pieces/pawn.h"
 
 extern Logger logger;
 extern Logger gameplayLogger;
+extern GameState gameState;
 
 // Helper function to determine piece notation based on type
 std::string getPieceNotation(const Piece* piece) {
-    if (dynamic_cast<const Pawn*>(piece)) return "";
-    if (dynamic_cast<const Knight*>(piece)) return "N";
-    if (dynamic_cast<const Bishop*>(piece)) return "B";
-    if (dynamic_cast<const Rook*>(piece)) return "R";
-    if (dynamic_cast<const Queen*>(piece)) return "Q";
-    if (dynamic_cast<const King*>(piece)) return "K";
+    if (!piece) return "";
+    switch (piece->getType()) {
+        case PieceType::PAWN:   return "";
+        case PieceType::KNIGHT: return "N";
+        case PieceType::BISHOP: return "B";
+        case PieceType::ROOK:   return "R";
+        case PieceType::QUEEN:  return "Q";
+        case PieceType::KING:   return "K";
+    }
     return "";
 }
 
@@ -29,9 +27,9 @@ void Memory::addMove(int round, int pieceUID, bool isWhiteTurn, const std::strin
 
     // Find the piece by UID to get its type
     const Piece* piece = nullptr;
-    for (const auto& p : pieces) {
+    for (const auto& p : gameState.pieces) {
         if (p->getUID() == pieceUID) {
-            piece = p;
+            piece = p.get();
             break;
         }
     }
@@ -51,9 +49,9 @@ MemoryEntry Memory::getLastMove() const {
     if (!moveHistory.empty()) {
         MemoryEntry lastMove = moveHistory.back();
         const Piece* piece = nullptr;
-        for (const auto& p : pieces) {
+        for (const auto& p : gameState.pieces) {
             if (p->getUID() == lastMove.pieceUID) {
-                piece = p;
+                piece = p.get();
                 break;
             }
         }
@@ -85,9 +83,9 @@ void Memory::removeLastMove() {
     if (!moveHistory.empty()) {
         MemoryEntry lastMove = moveHistory.back();
         const Piece* piece = nullptr;
-        for (const auto& p : pieces) {
+        for (const auto& p : gameState.pieces) {
             if (p->getUID() == lastMove.pieceUID) {
-                piece = p;
+                piece = p.get();
                 break;
             }
         }
@@ -118,20 +116,20 @@ void Memory::clearMemory() {
 }
 
 void Memory::logMemoryState() const {
-    std::ofstream memoryLogFile("logs/memory.log", std::ios::out | std::ios::trunc);  // Open file in truncate mode
+    std::ofstream memoryLogFile("logs/memory.log", std::ios::out | std::ios::trunc);
     if (memoryLogFile.is_open()) {
         for (const auto& entry : moveHistory) {
             const Piece* piece = nullptr;
-            for (const auto& p : pieces) {
+            for (const auto& p : gameState.pieces) {
                 if (p->getUID() == entry.pieceUID) {
-                    piece = p;
+                    piece = p.get();
                     break;
                 }
             }
             std::string pieceNotation = getPieceNotation(piece);
-            memoryLogFile << "{" << entry.round << ", " << entry.pieceUID << ", " 
-                          << (entry.isWhiteTurn ? "true" : "false") << ", " 
-                          << pieceNotation + entry.initialLocation << ", " 
+            memoryLogFile << "{" << entry.round << ", " << entry.pieceUID << ", "
+                          << (entry.isWhiteTurn ? "true" : "false") << ", "
+                          << pieceNotation + entry.initialLocation << ", "
                           << pieceNotation + entry.finalLocation << "}" << std::endl;
         }
         memoryLogFile.close();
