@@ -1,10 +1,12 @@
 #include "log.h"
+#include <filesystem>
 
 // Initialize the logger instance
 Logger logger("logs/debug.log");
 
 // Initialize the logger with the log file name
 Logger::Logger(const std::string& filename) {
+    std::filesystem::create_directories(std::filesystem::path(filename).parent_path());
     logFile.open(filename, std::ios::out);
     if (!logFile.is_open()) {
         std::cerr << "Failed to open log file: " << filename << std::endl;
